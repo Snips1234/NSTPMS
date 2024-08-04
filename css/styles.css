@@ -1,0 +1,94 @@
+@font-face{
+  font-family: 'Roboto';
+  font-weight: 400;
+  src: url('../assets/fonts/roboto-regular-webfont.woff2'), format('woff2'),
+      url('../assets/fonts/roboto-regular-webfont.woff'), format('woff');
+}
+@font-face{
+  font-family: 'Roboto';
+  font-weight: 500;
+  src: url('../assets/fonts/roboto-medium-webfont.woff2'), format('woff2'),
+      url('../assets/fonts/roboto-medium-webfont.woff'), format('woff');
+}
+@font-face{
+  font-family: 'Roboto';
+  font-weight: 700;
+  src: url('../assets/fonts/roboto-bold-webfont.woff2'), format('woff2'),
+      url('../assets/fonts/roboto-bold-webfont.woff'), format('woff');
+}
+@font-face{
+  font-family: 'Roboto';
+  font-weight: 900;
+  src: url('../assets/fonts/roboto-black-webfont.woff2'), format('woff2'),
+      url('../assets/fonts/roboto-black-webfont.woff'), format('woff');
+}
+
+:root {
+  --mint-green: #E0F4EEff; 
+  --eggshell: #F7F3DFff; 
+  --castleton-green: #096050ff; 
+  --field-drab: #725730ff; 
+  --floral-white: #FEFBF3ff; 
+  --orange-peel: #FF9F00ff; 
+  --white: #FFFFFFff;
+}
+
+
+/* body {
+  font-family: 'Roboto', sans-serif;
+} */
+
+
+.w_400 {
+  font-weight: 400;
+}
+.w_500 {
+  font-weight: 500;
+}
+.w_700 {
+  font-weight: 700;
+}
+.w_900 {
+  font-weight: 900;
+}
+
+.login_btn {
+  background-color: var(--orange-peel);
+  text-transform: capitalize;
+}
+
+.login_btn:hover {
+  background-color: var(--castleton-green);
+}
+
+.wrapper {
+
+  background: linear-gradient(rgba(0,0,0,0.6),rgba(0,0,0,0.6)), url("../Images/bg_img.jpg") center center;
+  background-size: cover;
+  width: 100vw;
+  height: 100vh;
+}
+
+.image_container > img{
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.full_w {
+  width: 100vw;
+}
+
+.full_h {
+  height: 100vh;
+}
+
+
+/* .sign-up-container {
+  background: url("../Images/school\ logo-modified.png") center center;
+  background-size: contain;
+  background-repeat: no-repeat;
+  z-index: -1;
+} */
+
