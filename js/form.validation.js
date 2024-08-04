@@ -1,4 +1,9 @@
 $(document).ready(function(){
+  $.validator.addMethod("regex", function(value, element, regexp) {
+    var re = new RegExp(regexp);
+    return this.optional(element) || re.test(value);
+  }, "Invalid value.");
+
   $('#sign-up-form').validate({
     rules: {
             'first-name': {
@@ -36,7 +41,7 @@ $(document).ready(function(){
               required: true,
               minlength:2
             },
-            'address-Province': {
+            'address-province': {
               required: true,
               minlength:2
             },
@@ -86,7 +91,7 @@ $(document).ready(function(){
             'password': {
               required: true,
               minlength: 8,
-              pattern: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
+              regex: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/
             },
             'confirm-password': {
               required: true,
@@ -94,7 +99,7 @@ $(document).ready(function(){
             }
     },
     errorPlacement: function(error, element) {
-            // Customize this if you want specific error message placement
+      error.appendTo(element.closest('.control').find('.error-container'));
     },
     highlight: function(element) {
       $(element).removeClass('is-valid').addClass('is-invalid');
@@ -106,4 +111,7 @@ $(document).ready(function(){
       form.submit();
     }
   });
+
+  // console.log('got thru');
+
 });
