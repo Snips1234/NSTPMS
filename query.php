@@ -18,7 +18,6 @@ function insertData($query, $params, $location)
     if ($success) {
       $_SESSION['response'] = "success";
       header('Location: ' . $location . '.php');
-
       exit();
     } else {
       $_SESSION['response'] = "failed";
@@ -62,7 +61,7 @@ if (isset($_POST['cwts-sign-up'])) {
     ':contact_person_number' => strtoupper($_POST['contact-person-number']),
     ':student_type' => strtoupper($_POST['student-type']),
     ':username' => $_POST['username'],
-    ':pass' => password_hash($_POST['student-type'], PASSWORD_ARGON2I),
+    ':pass' => password_hash($_POST['password'], PASSWORD_ARGON2I),
   );
 
   insertData($query, $params, 'cwts.page');
@@ -95,8 +94,56 @@ if (isset($_POST['lts-sign-up'])) {
     ':contact_person_number' => strtoupper($_POST['contact-person-number']),
     ':student_type' => strtoupper($_POST['student-type']),
     ':username' => $_POST['username'],
-    ':pass' => password_hash($_POST['student-type'], PASSWORD_ARGON2I),
+    ':pass' => password_hash($_POST['password'], PASSWORD_ARGON2I),
   );
 
   insertData($query, $params, 'lts.page');
+}
+
+function logError($message)
+{
+  $logFile = 'error_log.txt';
+  $timestamp = date('Y-m-d H:i:s');
+  file_put_contents($logFile, "[$timestamp] $message\n", FILE_APPEND);
+}
+
+
+if (isset($_POST['login-form'])) {
+  try {
+    require_once('connection/dsn.php');
+
+
+    $query = "SELECT * FROM tbl_20_columns WHERE `username` = :username";
+
+    $stmt = $pdo->prepare($query);
+    $stmt->bindValue(':username', $_POST['username']);
+    $result = $stmt->execute();
+
+    if ($result) {
+      $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+      if (password_verify($_POST['password'], $user['pass'])) {
+        $_SESSION['user'] = $user['l_name'] . ' ' . $user['f_name'] . ' ' . $user['m_name'] . ' ' . $user['ex_name'];
+        if ($user['nstp_component'] == 'CWTS') {
+          header('Location: cwts.page.php');
+          exit();
+        } else {
+          header('Location: lts.page.php');
+          exit();
+        }
+      } else {
+        $_SESSION['response'] = "failed";
+        header('Location: login-page.php');
+        exit();
+      }
+    } else {
+      $_SESSION['response'] = "failed";
+      header('Location: login-page.php');
+      exit();
+    }
+  } catch (PDOException $e) {
+    $_SESSION['response'] = $e->getMessage();
+    header('Location: login-page.php');
+    exit();
+  }
 }

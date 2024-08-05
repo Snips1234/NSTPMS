@@ -138,5 +138,25 @@ $(document).ready(function(){
   });
 
   // console.log('got thru');
+});
 
+$(document).ready(function() {
+  $('#login-form').validate({
+    rules: {
+      'username': {
+        required: true,
+        minlength: 2,
+      },
+      'password': {
+        required: true,
+        minlength: 8,
+      }
+    },
+    errorPlacement: function(error, element) {
+      error.appendTo(element.closest('.form-floating').find('.error-container'));
+    },
+    submitHandler: function(form) {
+      form.submit();
+    }
+  });
 });
