@@ -60,6 +60,16 @@
 .login_btn:hover {
   background-color: var(--castleton-green);
 }
+.sign-up-btn {
+  background-color: var(--castleton-green);
+  text-transform: capitalize;
+
+}
+
+.sign-up-btn:hover {
+  background-color: var(--orange-peel);
+  color: var(--castleton-green);
+}
 
 .wrapper {
 

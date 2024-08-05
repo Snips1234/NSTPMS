@@ -4,6 +4,28 @@ $(document).ready(function(){
     return this.optional(element) || re.test(value);
   }, "Invalid value.");
 
+  $.validator.addMethod('validNumber', function(value, element) {
+    value = $.trim(value);
+    var contactNumberRegex = /^\d{11}$/;
+    return this.optional(element) || contactNumberRegex.test(value);
+  }, 'Please enter a valid number.');
+
+  $.validator.addMethod("usernameUnique", function(value, element) {
+    var isSuccess = false;
+
+    $.ajax({
+        type: "POST",
+        url: "checkUsername.php", 
+        data: {username:value}, 
+        dataType: "json",
+        async: false,
+        success: function(response) {
+          isSuccess = response.status == 'available';
+        }
+    });
+    return isSuccess;
+  }, "Username already exists.");
+
   $('#sign-up-form').validate({
     rules: {
             'first-name': {
@@ -55,7 +77,8 @@ $(document).ready(function(){
             'contact-number': {
               required: true,
               minlength:11,
-              maxlength:11
+              maxlength:11,
+              validNumber:true
             },
             'email': {
               required: true,
@@ -82,11 +105,13 @@ $(document).ready(function(){
             'contact-person-number': {
               required: true,
               minlength:11,
-              maxlength:11
+              maxlength:11,
+              validNumber:true
             },
             'username': {
               required: true,
-              minlength:2
+              minlength:2,
+              usernameUnique: true
             },
             'password': {
               required: true,

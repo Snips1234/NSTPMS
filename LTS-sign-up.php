@@ -8,7 +8,7 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="icons/css/all.css">
   <link rel="stylesheet" href="css/styles.css">
-  <title>CWTS Sign up</title>
+  <title>LTS Sign up</title>
   <style>
     .min-width {
       min-width: 360px;
@@ -26,7 +26,7 @@
               <a class="navbar-brand" href="index.php">
                 <img src="Images/school logo-modified.png" alt="School logo" width="48px" height="48px">
               </a>
-              <h2>CWTS Student Registration</h2>
+              <h2>LTS Student Registration</h2>
               <ul class="navbar-nav">
                 <li>
                   <a href="index.php" class="btn login_btn w_500 text-white align-self-end">
@@ -43,9 +43,9 @@
 
   <div class="container mb-5 min-width">
     <form id="sign-up-form" action="query.php" method="post" novalidate>
-      <input type="hidden" name="student-type" value="CWTS">
+      <input type="hidden" name="student-type" value="LTS">
       <div class="card">
-        <div class="card-header bg-primary">
+        <div class="card-header bg-success">
           <h3 class="fs-4 text-white">Create an account</h3>
         </div>
         <div class="card-body">
@@ -264,7 +264,7 @@
           <div class="card-footer d-flex justify-content-end">
             <div class="row">
               <div class="col-12">
-                <button type="submit" name="cwts-sign-up" class="btn btn-primary">Submit</button>
+                <button type="submit" name="lts-sign-up" class="btn btn-primary">Submit</button>
               </div>
             </div>
           </div>
