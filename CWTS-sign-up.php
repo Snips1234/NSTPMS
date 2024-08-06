@@ -17,6 +17,7 @@
 </head>
 
 <body>
+  <?php include('confirmation.modal.php'); ?>
   <header class="min-width">
     <div class="container mb-3">
       <div class="row">
@@ -265,6 +266,7 @@
             <div class="row">
               <div class="col-12">
                 <button type="submit" name="cwts-sign-up" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button>
               </div>
             </div>
           </div>

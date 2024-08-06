@@ -17,6 +17,7 @@
 </head>
 
 <body>
+  <?php include('confirmation.modal.php'); ?>
   <header class="min-width">
     <div class="container mb-3">
       <div class="row">
@@ -45,7 +46,7 @@
     <form id="sign-up-form" action="query.php" method="post" novalidate>
       <input type="hidden" name="student-type" value="LTS">
       <div class="card">
-        <div class="card-header bg-success">
+        <div class="card-header bg-primary">
           <h3 class="fs-4 text-white">Create an account</h3>
         </div>
         <div class="card-body">
@@ -265,6 +266,7 @@
             <div class="row">
               <div class="col-12">
                 <button type="submit" name="lts-sign-up" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button>
               </div>
             </div>
           </div>
