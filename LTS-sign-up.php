@@ -1,3 +1,8 @@
+<?php
+session_start();
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -258,6 +263,7 @@
                   <label for="confirm-password" class="form-label text-secondary ">Confirm Password</label>
                   <input type="password" class="form-control " id="confirm-password" name="confirm-password" placeholder="Confirm Password">
                   <div class="error-container fs-6 text-danger" style="font-size: 12px !important;"></div>
+
                 </div>
               </div>
             </div>
