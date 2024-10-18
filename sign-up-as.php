@@ -30,14 +30,17 @@
   </style>
 </head>
 
-<body>
+<body class="wrapper">
 
 
   <div class="position-relative full_h">
     <div class="position-absolute top-50 start-50 translate-middle ">
-      <div class="container container-custom shadow p-5 rounded-4">
+      <div class="bg-white container container-custom shadow p-5 rounded-4">
         <div class="row">
           <div class="col-12 col-md-6">
+            <a href="index.php" type="button" class="d-block mb-3 text-black">
+              <i class="fa fa-arrow-left fs-5" aria-hidden="true"></i>
+            </a>
             <img src="./Images/school logo-modified.png" alt="School logo" width="48px" height="48px">
             <h2 class="mt-2">Sign up</h2>
             <p>Choose what is appropriate for you</p>
@@ -45,6 +48,7 @@
           <div class="col-12 col-md-6 d-flex justify-content-center flex-column">
             <a href="CWTS-sign-up.php" class="btn sign-up-btn w_500 text-white w-100 mb-3">CWTS student</a>
             <a href="LTS-sign-up.php" class="btn sign-up-btn w_500 text-white w-100 mb-3">LTS Student</a>
+            <a href="ROTC-sign-up.php" class="btn sign-up-btn w_500 text-white w-100 mb-3">ROTC Student</a>
           </div>
         </div>
       </div>

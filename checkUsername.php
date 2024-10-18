@@ -1,19 +1,23 @@
 <?php
 
-if ($_POST['username']) {
+if (!empty($_POST['username']) && !empty($_POST['student-type'])) {
   require_once('connection/dsn.php');
 
-  $query = "SELECT * FROM tbl_20_columns WHERE username = :username";
+  $tableName = ($_POST['student-type'] === 'CWTS') ? 'tbl_20_columns_cwts' : 'tbl_20_columns_lts';
 
+  $query = "SELECT COUNT(*) FROM $tableName WHERE username = :username";
+  
   $stmt = $pdo->prepare($query);
-  $stmt->bindValue(':username', $_POST['username']);
-
+  $stmt->bindValue(':username', $_POST['username'], PDO::PARAM_STR);
   $stmt->execute();
 
   $count = $stmt->fetchColumn();
 
-  echo json_encode(['status' => $count > 0 ? 'taken' : 'available']);
 
-  $stmt = null;
-  $pdo = null;
+  error_log("Username: {$_POST['username']}, Student Type: {$_POST['student-type']}, Count: {$count}");
+
+
+  echo json_encode(['status' => $count > 0 ? 'taken' : 'available']);
+} else {
+  echo json_encode(['status' => 'error', 'message' => 'Invalid input.']);
 }

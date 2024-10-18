@@ -4,6 +4,8 @@
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="icons/css/all.css">
   <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/toastr.min.css">
+  <script src="js/toastr.min.js"></script>
   <style>
     .container-custom {
       min-width: 350px;
