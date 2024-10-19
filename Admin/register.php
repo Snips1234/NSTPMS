@@ -280,7 +280,7 @@ try {
                       </div>
                     </div>
                   </fieldset>
-                  <fieldset>
+                  <fieldset> 
                     <legend class="text-black-50">College Information</legend>
                      <div class="row">
                       <div class="col-12 mb-3">
