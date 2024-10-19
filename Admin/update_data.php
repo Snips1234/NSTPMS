@@ -11,10 +11,9 @@ if (isset($_GET['std_id'])) {
 		require_once('../connection/dsn.php');
 		$pdo = getDatabaseConnection();
 
-		$query = "SELECT l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province, region, 
-                c_status, religion, email_add, cp_number, college, y_level, course, major, 
-                serial_number, cpce, cpce_cp_number, nstp_component, nstp_grad_year, created_at
-                FROM tbl_20_columns_rotc WHERE std_id = :id";
+		$query = "SELECT l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province,
+                c_status, religion, region, email_add, cp_number, college, y_level, course, major, cpce, cpce_cp_number, nstp_component, created_at
+                FROM tbl_20_columns WHERE std_id = :id";
 
 		$stmt = $pdo->prepare($query);
 		$stmt->bindParam(':id', $std_id, PDO::PARAM_INT);
@@ -24,6 +23,20 @@ if (isset($_GET['std_id'])) {
 		echo 'Connection failed: ' . $e->getMessage();
 	}
 }
+
+try {
+  require_once('../connection/dsn.php'); 
+  $pdo = getDatabaseConnection();
+
+  $query = "SELECT * FROM `tbl_region`";
+
+  $stmt = $pdo->prepare($query);
+  $stmt->execute();
+  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+}catch (PDOException $e) {
+  echo 'Connection failed: ' . $e->getMessage();
+}
+
 
 
 ?>
@@ -40,7 +53,7 @@ if (isset($_GET['std_id'])) {
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-						<li class="breadcrumb-item"><a href="rotc.php">ROTC</a></li>
+						<li class="breadcrumb-item"><a href="enrollment.php">Enrollment</a></li>
 						<li class="breadcrumb-item">Update Data</li>
 					</ol>
 				</div><!-- /.col -->
@@ -55,52 +68,14 @@ if (isset($_GET['std_id'])) {
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<form id="admin-edit-form" action="../query.php" method="post" novalidate>
-							<input type="hidden" id="student-type" name="student-type" value="ROTC">
+						<form id="admin-edit" action="../query.php" method="post" novalidate>
+							<input type="hidden" id="student-type" name="student-type" value="CWTS">
 							<input type="hidden" id="std_id" name="std_id" value="<?= htmlspecialchars($_GET['std_id']) ?>">
 							<div class="card">
 								<div class="card-header bg-success">
-									<h4 class="text-white">Update rotc student data</h4>
+									<h4 class="text-white">Update student data</h4>
 								</div>
 								<div class="card-body">
-									<fieldset>
-										<legend class="text-black-50">Graduation year/Serial number/Region</legend>
-										<div class="row">
-											<div class="col-lg-4 mb-3">
-												<div class="control">
-													<label for="graduation-year" class="form-label text-secondary">NSTP graduation year <span class="text-danger">*</span></label>
-													<input type="text" class="form-control <?= isset($_SESSION['errors']['graduation-year']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="graduation-year" name="graduation-year" placeholder="Enter your NSTP graduation year" value="<?= isset($_SESSION['old-data']['graduation-year']) ? htmlspecialchars($_SESSION['old-data']['graduation-year']) : (isset($results['nstp_grad_year']) ? htmlspecialchars($results['nstp_grad_year']) : '') ?>">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['graduation-year'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['graduation-year']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-											<div class="col-lg-4 mb-3">
-												<div class="control">
-													<label for="serial-number" class="form-label text-secondary">NSTP serial number <span class="text-danger">*</span></label>
-													<input type="text" class="form-control <?= isset($_SESSION['errors']['serial-number']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="serial-number" name="serial-number" placeholder="Enter your NSTP serial number" value="<?= isset($_SESSION['old-data']['serial-number']) ? htmlspecialchars($_SESSION['old-data']['serial-number']) : (isset($results['serial_number']) ? htmlspecialchars($results['serial_number']) : '') ?>">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['serial-number'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['serial-number']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-											<div class="col-lg-4 mb-3">
-												<div class="control">
-													<label for="region" class="form-label text-secondary">Region <span class="text-danger">*</span></label>
-													<input type="text" class="form-control <?= isset($_SESSION['errors']['region']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="region" name="region" placeholder="Enter you region" value="<?= isset($_SESSION['old-data']['region']) ? htmlspecialchars($_SESSION['old-data']['region']) : (isset($results['region']) ? htmlspecialchars($results['region']) : '') ?>">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['region'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['region']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-										</div>
-									</fieldset>
 									<fieldset>
 										<legend class="text-black-50">Full Name</legend>
 										<div class="row">
@@ -164,50 +139,32 @@ if (isset($_GET['std_id'])) {
 													</div>
 												</div>
 											</div>
-											<div class="col-md-6 mb-3">
-												<div class="control">
-													<label for="type-of-hei" class="form-label text-secondary">Type of HEIs <span class="text-danger">*</span></label>
-													<input type="text" class="form-control <?= isset($_SESSION['errors']['type-of-hei']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="type-of-hei" name="type-of-hei" placeholder="Type of HEI" value="<?= isset($_SESSION['old-data']['type-of-hei']) ? htmlspecialchars($_SESSION['old-data']['type-of-hei']) : (isset($results['type_of_HEI']) ? htmlspecialchars($results['type_of_HEI']) : '') ?>">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['type-of-hei'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['type-of-hei']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-										</div>
-									</fieldset>
-									<!-- <fieldset>
-                    <legend class="text-black-50">Birthday and Gender</legend>
-                    <div class="row">
-                      <div class="col-md-6 mb-3">
-                        <div class="control">
-                          <label for="birthday" class="form-label text-secondary">Birthday</label>
-                          <input type="date" class="form-control <?= isset($errors['birthday']) ? 'is-invalid' : '' ?>" id="birthday" name="birthday">
-                          <div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-                            <?php if (isset($errors['birthday'])): ?>
-                              <?= htmlspecialchars($errors['birthday']); ?>
-                            <?php endif; ?>
-                          </div>
-                        </div>
-                      </div>
-                      <div class="col-md-6 mb-3">
-                        <div class="control">
-                          <label for="gender" class="form-label text-secondary">Gender</label>
-                          <select class="form-select <?= isset($errors['gender']) ? 'is-invalid' : '' ?>" id="gender" name="gender">
-                            <option value="">Gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
+											  <div class="col-md-6 mb-3">
+                        <div class="control">`
+                          <label for="type-of-hei" class="form-label text-secondary">Types of HEIs <span class="text-danger">*</span></label>
+                          <select class="custom-select <?= isset($_SESSION['errors']['type-of-hei']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="type-of-hei" name="type-of-hei">
+                            <option selected disabled>Type of HEI</option>
+                            <option value="SUCs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'SUCs') ? 'selected' : '' ?>>
+                              SUCs
+                            </option>
+                            <option value="LUCs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'LUCs') ? 'selected' : '' ?>>
+                              LUCs
+                            </option>
+                             <option value="OGS" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'OGS') ? 'selected' : '' ?>>
+                              OGS
+                            </option>
+                             <option value="PHE" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'PHE') ? 'selected' : '' ?>>
+                              PHE
+                            </option>
                           </select>
                           <div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-                            <?php if (isset($errors['gender'])): ?>
-                              <?= htmlspecialchars($errors['gender']); ?>
+                            <?php if (isset($_SESSION['errors']['type-of-hei'])): ?>
+                              <?= htmlspecialchars($_SESSION['errors']['type-of-hei']); ?>
                             <?php endif; ?>
                           </div>
                         </div>
-                      </div>
-                    </div>
-                  </fieldset> -->
+										</div>
+									</fieldset>
 									<fieldset>
 										<legend class="text-black-50">Birthday and Gender</legend>
 										<div class="row">
@@ -221,7 +178,7 @@ if (isset($_GET['std_id'])) {
 											</div>
 											<div class="col-md-6 mb-3">
 												<div class="control">
-													<label for="gender" class="form-label text-secondary">Gender <span class="text-danger">*</span></label>
+													<label for="gender" class="form-label text-secondary">Sex <span class="text-danger">*</span></label>
 													<select class="custom-select <?= isset($_SESSION['errors']['gender']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="gender" name="gender">
 														<option value="" disabled <?= !isset($_SESSION['old-data']['gender']) && !isset($results['sex']) ? 'selected' : '' ?>>Gender</option>
 														<option value="male" <?= (isset($_SESSION['old-data']['gender']) && strtolower($_SESSION['old-data']['gender']) === 'male') || (isset($results['sex']) && strtolower($results['sex']) === 'male') ? 'selected' : '' ?>>Male</option>
@@ -337,10 +294,7 @@ if (isset($_GET['std_id'])) {
 														<!-- Make the options dynamic -->
 														<option value="" disabled <?= !isset($_SESSION['old-data']['college']) && !isset($results['college']) ? 'selected' : '' ?>>College</option>
 														<option value="agriculture" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'agriculture') || (isset($results['college']) && strtolower($results['college']) === 'agriculture') ? 'selected' : '' ?>>AGRICULTURE</option>
-														<option value="arts & science" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'arts & science') || (isset($results['college']) && strtolower($results['college']) === 'arts & science') ? 'selected' : '' ?>>ARTS & SCIENCE</option>
-														<option value="education" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'education') || (isset($results['college']) && strtolower($results['college']) === 'education') ? 'selected' : '' ?>>EDUCATION</option>
-														<option value="engineering" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'engineering') || (isset($results['college']) && strtolower($results['college']) === 'engineering') ? 'selected' : '' ?>>ENGINEERING</option>
-														<option value="industrial technology" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'industrial technology') || (isset($results['college']) && strtolower($results['college']) === 'industrial technology') ? 'selected' : '' ?>>INDUSTRIAL TECHNOLOGY</option>
+														
 													</select>
 													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
 														<?php if (isset($_SESSION['errors']['college'])): ?>
@@ -376,7 +330,7 @@ if (isset($_GET['std_id'])) {
 														<?php if (isset($_SESSION['errors']['course'])): ?>
 															<?= htmlspecialchars($_SESSION['errors']['course']); ?>
 														<?php endif; ?>
-													</div>
+													</div>		
 												</div>
 											</div>
 											<div class="col-md-6 mb-3">
@@ -398,7 +352,7 @@ if (isset($_GET['std_id'])) {
 											<div class="col-md-6 mb-3">
 												<div class="control">
 													<label for="contact-person-name" class="form-label text-secondary">Contact Name <span class="text-danger">*</span></label>
-													<input type="text" class="form-control <?= isset($_SESSION['errors']['contact-person-name']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="contact-person-name" name="contact-person-name" placeholder="Emergency Contact Person Name" value="<?= isset($_SESSION['old-data']['contact-person-name']) ? htmlspecialchars($_SESSION['old-data']['contact-person-name']) : (isset($results['cpce']) ? htmlspecialchars($results['cpce']) : '') ?>">
+													<input type="text" class="form-control <?= isset($_SESSION['errors']['contact-person-name']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="contact-person-name" name="contact-person-name" placeholder="Enter your  contact person name" value="<?= isset($_SESSION['old-data']['contact-person-name']) ? htmlspecialchars($_SESSION['old-data']['contact-person-name']) : (isset($results['cpce']) ? htmlspecialchars($results['cpce']) : '') ?>">
 													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
 														<?php if (isset($_SESSION['errors']['contact-person-name'])): ?>
 															<?= htmlspecialchars($_SESSION['errors']['contact-person-name']); ?>
@@ -419,37 +373,10 @@ if (isset($_GET['std_id'])) {
 											</div>
 										</div>
 									</fieldset>
-									<fieldset>
-										<legend class="text-black-50">Login Credential</legend>
-										<div class="row">
-											<div class="col-lg-6 mb-3">
-												<div class="control">
-													<label for="password" class="form-label text-secondary">Password</label>
-													<input type="password" class="form-control <?= isset($_SESSION['errors']['password']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="password" name="password" placeholder="Enter your Password (leave empty to keep current)">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['password'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['password']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-											<div class="col-lg-6 mb-3">
-												<div class="control">
-													<label for="confirm-password" class="form-label text-secondary ">Confirm Password</label>
-													<input type="password" class="form-control <?= isset($_SESSION['errors']['confirm-password']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="confirm-password" name="confirm-password" placeholder="Confirm Password (leave empty to keep current)">
-													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-														<?php if (isset($_SESSION['errors']['confirm-password'])): ?>
-															<?= htmlspecialchars($_SESSION['errors']['confirm-password']); ?>
-														<?php endif; ?>
-													</div>
-												</div>
-											</div>
-										</div>
-									</fieldset>
 									<div class="card-footer d-flex justify-content-end">
 										<div class="row">
 											<div class="col-12">
-												<button type="submit" name="admin-edit-rotc" class="btn btn-success" value="Submit">Submit</button>
+												<button type="submit" name="admin-update" class="btn btn-success" value="Submit">Submit</button>
 												<!-- <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button> -->
 											</div>
 										</div>
@@ -461,6 +388,8 @@ if (isset($_GET['std_id'])) {
 			</div>
 		</div>
 	</section>
+
+
 </div>
 
 

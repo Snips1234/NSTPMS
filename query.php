@@ -6,26 +6,17 @@ include_once('includes/rules.php');
 $pdo = getDatabaseConnection();
 
 
-// edit cwts
-if (isset($_POST['admin-edit-cwts'])) {
+// update data
+if (isset($_POST['admin-update'])) {
   $data = $_POST;
   //var_dump($data);
   $errors = validate($data, $edit_rules, $pdo);
-
-
-  if (!empty($data['password'])) {
-    if (strlen($data['password']) < 8) {
-      $errors['password'] = "Password must be at least 8 characters long.";
-    } elseif ($data['confirm-password'] !== $data['password']) {
-      $errors['confirm-password'] = "Confirm password doesn't match the password.";
-    }
-  }
 
   if (count($errors) === 0) {
 
     if (empty($data['password'])) {
       try {
-        $stmt = $pdo->prepare("SELECT pass FROM tbl_20_columns_cwts WHERE std_id = :std_id");
+        $stmt = $pdo->prepare("SELECT pass FROM tbl_20_columns WHERE std_id = :std_id");
         $stmt->bindValue(':std_id', $data['std_id'], PDO::PARAM_INT);
         $stmt->execute();
         $currentPassword = $stmt->fetchColumn();
@@ -38,7 +29,7 @@ if (isset($_POST['admin-edit-cwts'])) {
 
 
     $query = "UPDATE tbl_20_columns_cwts
-                  SET nstp_grad_year = :nstp_grad_year, serial_number = :serial_number, l_name = :last_name, f_name = :first_name, ex_name = :name_extension, 
+                  SET l_name = :last_name, f_name = :first_name, ex_name = :name_extension, 
                       m_name = :middle_name, HEI_name = :HEI_name, type_of_HEI = :type_of_HEI, b_date = :birthday, sex = :gender, 
                       st_brgy = :address_street_barangay, municipality = :address_municipality, 
                       province = :address_province, region = :region, c_status = :civil_status, religion = :religion, 
@@ -55,8 +46,6 @@ if (isset($_POST['admin-edit-cwts'])) {
 
 
     $params = [
-      ':nstp_grad_year' => ucwords($data['graduation-year']),
-      ':serial_number' => ucwords($data['serial-number']),
       ':last_name' => ucwords($data['last-name']),
       ':first_name' => ucwords($data['first-name']),
       ':name_extension' => ucwords($data['name-extension']),

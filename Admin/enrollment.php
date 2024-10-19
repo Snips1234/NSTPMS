@@ -91,7 +91,7 @@ try {
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-            <li class="breadcrumb-item">Students List</li>
+            <li class="breadcrumb-item">Enrollment</li>
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -112,7 +112,7 @@ try {
                     <i class="fas fa-minus"></i>
                   </button>
                 </div>
-                <h3 class="card-title">NSTP Student List</h3>
+                <h3 class="card-title">Student List</h3>
                 <div class="mt-5 d-flex justify-content-between align-items-center">
                   <a href="register.php" class="btn btn-primary" style="width: 160px !important;">
                     Register
@@ -158,7 +158,7 @@ try {
                               <a href="javascript:void(0)" class="btn btn-tool open-view-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-type="view" data-target="#view_modal">
                                 <i class="fas fa-eye text-primary"></i>
                               </a>
-                              <a href="edit_cwts.php?std_id=<?= htmlspecialchars($row['std_id']) ?>" class="btn btn-tool">
+                              <a href="update_data.php?std_id=<?= htmlspecialchars($row['std_id']) ?>" class="btn btn-tool">
                                 <i class="fas fa-pen text-success"></i>
                               </a>
                               <a href="javascript:void(0)" class="btn btn-tool open-delete-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-target="#delete_modal" data-type="delete">

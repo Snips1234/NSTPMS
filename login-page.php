@@ -66,7 +66,7 @@ session_start();
             <a href="index.php" type="button" class="d-block mb-3 text-black">
               <i class="fa fa-arrow-left fs-5" aria-hidden="true"></i>
             </a>
-            <img src="./Images/school logo-modified.png" alt="School logo" width="48px" height="48px">
+            <!-- <img src="./Images/school logo-modified.png" alt="School logo" width="48px" height="48px"> -->
             <h2 class="mt-2">Sign in</h2>
             <p>Use your account</p>
           </div>
