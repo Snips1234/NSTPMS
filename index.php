@@ -36,10 +36,10 @@ session_start();
       <div class="row">
         <div class="col"></div>
         <div class="col">
-          <!-- <img src="./Images/school logo-modified.png" style="width: 95%; min-width: 4rem; " alt="School logo"> -->
+          <img src="./Images/school logo-modified.png" style="width: 95%; min-width: 4rem; " alt="School logo">
         </div>
         <div class="col">
-          <!-- <img src="./Images/nstp_logo.png" style="width: 95%; min-width: 4rem;" alt="NSTP School logo"> -->
+          <img src="./Images/nstp_logo.png" style="width: 95%; min-width: 4rem;" alt="NSTP School logo">
         </div>
         <div class="col"></div>
       </div>

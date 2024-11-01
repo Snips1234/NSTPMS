@@ -21,28 +21,34 @@ function getRowCount($pdo, $tableName, $condition = '')
 }
 
 
-function getData($pdo, $tableName, $yearLevel = 'all', $college = 'all', $ntspComponent = null)
+function getData($pdo,  $yearLevel, $college, $ntspComponent, $sex, $search)
 {
     // Build the base query
-    $query = "SELECT * FROM `tbl_20_columns" . $tableName . "` WHERE 1=1";
+    $query = "SELECT * FROM `tbl_20_columns` WHERE 1=1";
 
-    // Prepare parameters for binding
     $params = [];
 
-    // Add conditions based on the provided parameters
-    if ($yearLevel !== 'all') {
+    if ($yearLevel) {
         $query .= " AND y_level = :yearLevel";
         $params[':yearLevel'] = $yearLevel;
     }
 
-    if ($college !== 'all') {
+    if ($college) {
         $query .= " AND college = :college";
         $params[':college'] = $college;
     }
 
-    if ($ntspComponent !== null) {
+    if ($ntspComponent) {
         $query .= " AND nstp_component = :ntspComponent";
         $params[':ntspComponent'] = $ntspComponent;
+    }
+    if ($sex) {
+        $query .= " AND sex = :sex";
+        $params[':sex'] = $sex;
+    }
+    if ($search) {
+        $query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+        $params[':search'] = $search;
     }
 
     // Prepare and execute the statement 

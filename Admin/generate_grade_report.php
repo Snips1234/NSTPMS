@@ -11,39 +11,19 @@ require "../includes/functions.php";
 require "../connection/dsn.php";
 
 if (isset($_POST['generate-report'])) {
-	// $fileName = $_POST['file-name'];
-	// $reportTitle = $_POST['report-title'];
-	$college = $_POST['college'] ?? '';
-	$yearLevel = $_POST['year-level'] ?? '';
-	$ntspComponent = $_POST['nstp-component'] ?? '';
-	$reportTitle = "Student Grades Report"; // Add a report title variable
 
-	// Get database connection (you should implement this function)
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$sex = isset($_POST['sex']) ? $_POST['sex'] : '';
+	$college = isset($_POST['college']) ? $_POST['college'] : '';
+	$yearLevel = isset($_POST['year_level']) ? $_POST['year_level'] : '';
+	$ntspComponent = isset($_POST['nstp-component']) ? $_POST['nstp-component'] :  '';
+
+
 	$pdo = getDatabaseConnection();
-
-	// Determine which table to use based on ntspComponent
-	$tableName = "cwts"; // Default table
-	if (!empty($ntspComponent)) {
-		switch ($ntspComponent) {
-			case "cwts":
-				$tableName = "cwts";
-				break;
-			case "lts":
-				$tableName = "lts";
-				break;
-			case "rotc":
-				$tableName = "rotc";
-				break;
-			default:
-				$tableName = "cwts"; // Default to cwts if none match
-		}
-	}
-
 	// Retrieve data based on the form input
-	$data = getData($pdo, $tableName, $yearLevel, $college, $ntspComponent); // Implement this function to get data from the database
-
+	$data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search);
 	$headers = [
-		'Seq No.' => 'seq_no', // Add sequence number column
+		'Seq No.' => 'std_id', // Add sequence number column
 		'NSTP Serial Number' => 'serial_number', // Add serial number column
 		'Last Name' => 'l_name',
 		'First Name' => 'f_name',
@@ -51,7 +31,6 @@ if (isset($_POST['generate-report'])) {
 		'Middle Name' => 'm_name',
 		'Year Level' => 'y_level',
 		'Course' => 'course',
-		// 'First Semester' and 'Second Semester' will span across 5 columns each: Quater 1, Quarter 2, Average, Remarks, School Year
 	];
 
 	// Initialize PhpSpreadsheet
@@ -62,7 +41,6 @@ if (isset($_POST['generate-report'])) {
 	$columnCount = count($headers) + 10; // Adding 10 extra columns for both semesters (5 each)
 	$lastColumn = chr(64 + $columnCount); // Calculate last column letter
 	$sheet->mergeCells('A1:' . $lastColumn . '1'); // Merge cells for title
-	$sheet->setCellValue('A1', $reportTitle);
 	$sheet->getStyle('A1')->getFont()->setSize(16)->setBold(true);
 	$sheet->getStyle('A1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Center title horizontally
 	$sheet->getStyle('A1')->getAlignment()->setVertical(Alignment::VERTICAL_CENTER); // Center title vertically
@@ -86,7 +64,7 @@ if (isset($_POST['generate-report'])) {
 	$sheet->getStyle($firstSemesterStartColumn . '2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 	// Set sub-headers for First Semester (row 3)
-	$firstSemesterSubHeaders = ['Quarter 1', 'Quarter 2', 'Average', 'Remarks', 'School Year'];
+	$firstSemesterSubHeaders = ['Midterm Grade', 'Final Grade', 'Final Rating', 'Remarks', 'School Year'];
 	foreach ($firstSemesterSubHeaders as $subHeader) {
 		$sheet->setCellValue($column . '3', $subHeader);
 		$sheet->getStyle($column . '3')->getFont()->setBold(true);
@@ -102,7 +80,7 @@ if (isset($_POST['generate-report'])) {
 	$sheet->getStyle($secondSemesterStartColumn . '2')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
 	// Set sub-headers for Second Semester (row 3)
-	$secondSemesterSubHeaders = ['Quarter 1', 'Quarter 2', 'Average', 'Remarks', 'School Year'];
+	$secondSemesterSubHeaders = ['Midterm Grade', 'Final Grade', 'Final Rating', 'Remarks', 'School Year'];
 	foreach ($secondSemesterSubHeaders as $subHeader) {
 		$sheet->setCellValue($column . '3', $subHeader);
 		$sheet->getStyle($column . '3')->getFont()->setBold(true);

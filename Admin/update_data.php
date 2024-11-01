@@ -11,9 +11,7 @@ if (isset($_GET['std_id'])) {
 		require_once('../connection/dsn.php');
 		$pdo = getDatabaseConnection();
 
-		$query = "SELECT l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province,
-                c_status, religion, region, email_add, cp_number, college, y_level, course, major, cpce, cpce_cp_number, nstp_component, created_at
-                FROM tbl_20_columns WHERE std_id = :id";
+		$query = "SELECT * FROM tbl_20_columns WHERE std_id = :id";
 
 		$stmt = $pdo->prepare($query);
 		$stmt->bindParam(':id', $std_id, PDO::PARAM_INT);
@@ -24,20 +22,35 @@ if (isset($_GET['std_id'])) {
 	}
 }
 
+// echo "<pre>";
+// var_dump($results);
+// echo "</pre>";
+
 try {
-  require_once('../connection/dsn.php'); 
-  $pdo = getDatabaseConnection();
+	require_once('../connection/dsn.php');
+	$pdo = getDatabaseConnection();
 
-  $query = "SELECT * FROM `tbl_region`";
+	$query = "SELECT * FROM `tbl_region`";
 
-  $stmt = $pdo->prepare($query);
-  $stmt->execute();
-  $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
-}catch (PDOException $e) {
-  echo 'Connection failed: ' . $e->getMessage();
+	$stmt = $pdo->prepare($query);
+	$stmt->execute();
+	$regions = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+	echo 'Connection failed: ' . $e->getMessage();
 }
 
+try {
+	require_once('../connection/dsn.php');
+	$pdo = getDatabaseConnection();
 
+	$query = "SELECT * FROM `tbl_colleges`";
+
+	$stmt = $pdo->prepare($query);
+	$stmt->execute();
+	$colleges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+	echo 'Connection failed: ' . $e->getMessage();
+}
 
 ?>
 
@@ -48,7 +61,7 @@ try {
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h3 class="m-0"></h3>
+					<h3 class="m-0">UPDATE DATA</h3>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
@@ -139,34 +152,34 @@ try {
 													</div>
 												</div>
 											</div>
-											  <div class="col-md-6 mb-3">
-                        <div class="control">`
-                          <label for="type-of-hei" class="form-label text-secondary">Types of HEIs <span class="text-danger">*</span></label>
-                          <select class="custom-select <?= isset($_SESSION['errors']['type-of-hei']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="type-of-hei" name="type-of-hei">
-                            <option selected disabled>Type of HEI</option>
-                            <option value="SUCs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'SUCs') ? 'selected' : '' ?>>
-                              SUCs
-                            </option>
-                            <option value="LUCs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'LUCs') ? 'selected' : '' ?>>
-                              LUCs
-                            </option>
-                             <option value="OGS" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'OGS') ? 'selected' : '' ?>>
-                              OGS
-                            </option>
-                             <option value="PHE" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'PHE') ? 'selected' : '' ?>>
-                              PHE
-                            </option>
-                          </select>
-                          <div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
-                            <?php if (isset($_SESSION['errors']['type-of-hei'])): ?>
-                              <?= htmlspecialchars($_SESSION['errors']['type-of-hei']); ?>
-                            <?php endif; ?>
-                          </div>
-                        </div>
-										</div>
+											<div class="col-md-6 mb-3">
+												<div class="control">
+													<label for="type-of-hei" class="form-label text-secondary">Types of HEIs <span class="text-danger">*</span></label>
+													<select class="custom-select <?= isset($_SESSION['errors']['type-of-hei']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="type-of-hei" name="type-of-hei">
+														<option value="SUCs"
+															<?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'SUCs')
+																|| (isset($results['type_of_HEI']) && $results['type_of_HEI']  == 'SUCs') ? 'selected' : '' ?>>SUCs
+														</option>
+														<option value="LUCs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'LUCs') || (isset($results['type_of_HEI']) && $results['type_of_HEI'] == 'LUCs')  ? 'selected' : '' ?>>
+															LUCs
+														</option>
+														<option value="OGs" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'OGS') || (isset($results['type_of_HEI']) && $results['type_of_HEI'] == 'OGS') ? 'selected' : '' ?>>
+															OGs
+														</option>
+														<option value="Private HEI" <?= (isset($_SESSION['old-data']['type-of-hei']) && $_SESSION['old-data']['type-of-hei'] == 'PHE') || (isset($results['type_of_HEI']) && $results['type_of_HEI'] == 'PHE') ? 'selected' : '' ?>>
+															Private HEI
+														</option>
+													</select>
+													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
+														<?php if (isset($_SESSION['errors']['type-of-hei'])): ?>
+															<?= htmlspecialchars($_SESSION['errors']['type-of-hei']); ?>
+														<?php endif; ?>
+													</div>
+												</div>
+											</div>
 									</fieldset>
 									<fieldset>
-										<legend class="text-black-50">Birthday and Gender</legend>
+										<legend class="text-black-50">Birthday and Sex</legend>
 										<div class="row">
 											<div class="col-md-6 mb-3">
 												<div class="control">
@@ -230,6 +243,28 @@ try {
 												</div>
 											</div>
 										</div>
+										<div class="row">
+											<div class="col-12 mb-3">
+												<div class="control">
+													<?php $selectedRegion = $_SESSION['old-data']['region'] ?? $results['region'] ?? null ?>
+													<label for="region" class="form-label text-secondary">Region <span class="text-danger">*</span></label>
+													<select class="custom-select <?= isset($_SESSION['errors']['region']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="region" name="region">
+														<!-- <option selected disabled>-- Select region --</option> -->
+														<?php foreach ($regions as $region): ?>
+															<option value="<?= htmlspecialchars($region['region']); ?>"
+																<?= ($selectedRegion == $region['region']) ? 'selected' : '' ?>>
+																<?= htmlspecialchars($region['region']); ?>
+															</option>
+														<?php endforeach; ?>
+													</select>
+													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
+														<?php if (isset($_SESSION['errors']['gender'])): ?>
+															<?= htmlspecialchars($_SESSION['errors']['gender']); ?>
+														<?php endif; ?>
+													</div>
+												</div>
+											</div>
+										</div>
 									</fieldset>
 									<fieldset>
 										<legend class="text-black-50">Others</legend>
@@ -287,14 +322,34 @@ try {
 									<fieldset>
 										<legend class="text-black-50">College Information</legend>
 										<div class="row">
+											<div class="col-12 mb-3">
+												<div class="control">
+													<label for="nstp-component" class="form-label text-secondary">NSTP Component <span class="text-danger">*</span></label>
+													<select class="custom-select <?= isset($_SESSION['errors']['nstp-component']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="nstp-component" name="nstp-component" value="<?= isset($data['nstp-component']) ? htmlspecialchars($data['nstp-component']) : '' ?>">
+														<option value="CWTS" <?= (isset($_SESSION['old-data']['nstp-component']) && $_SESSION['old-data']['nstp-component'] == 'CWTS') || (isset($results['nstp_component']) && $results['nstp_component'] == 'CWTS')  ? 'selected' : '' ?>>CWTS</option>
+														<option value="LTS" <?= (isset($_SESSION['old-data']['nstp-component']) && $_SESSION['old-data']['nstp-component'] == 'LTS') || (isset($results['nstp_component']) && $results['nstp_component'] == 'LTS') ? 'selected' : '' ?>>LTS</option>
+														<option value="ROTC" <?= (isset($_SESSION['old-data']['nstp-component']) && $_SESSION['old-data']['nstp-component'] == 'ROTC') || (isset($results['nstp_component']) && $results['nstp_component'] == 'ROTC') ? 'selected' : '' ?>>ROTC</option>
+													</select>
+													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
+														<?php if (isset($_SESSION['errors']['nstp-component'])): ?>
+															<?= htmlspecialchars($_SESSION['errors']['nstp-component']); ?>
+														<?php endif; ?>
+													</div>
+												</div>
+											</div>
+										</div>
+										<div class="row">
 											<div class="col-md-6 mb-3">
 												<div class="control">
 													<label for="college" class="form-label text-secondary">College <span class="text-danger">*</span></label>
 													<select class="custom-select <?= isset($_SESSION['errors']['college']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="college" name="college" value="<?= isset($_SESSION['old-data']['college']) ? htmlspecialchars($data['college']) : '' ?>">
-														<!-- Make the options dynamic -->
-														<option value="" disabled <?= !isset($_SESSION['old-data']['college']) && !isset($results['college']) ? 'selected' : '' ?>>College</option>
-														<option value="agriculture" <?= (isset($_SESSION['old-data']['college']) && strtolower($_SESSION['old-data']['college']) === 'agriculture') || (isset($results['college']) && strtolower($results['college']) === 'agriculture') ? 'selected' : '' ?>>AGRICULTURE</option>
-														
+														<?php foreach ($colleges as $college): ?>
+															<option value="<?= htmlspecialchars($college['colleges']) ?>"
+																<?= (isset($_SESSION['old-data']['college']) && $_SESSION['old-data']['college'] === $college['colleges'])
+																	|| (isset($results['college']) && $results['college'] === $college['colleges']) ? 'selected' : '' ?>>
+																<?= htmlspecialchars($college['colleges']) ?>
+															</option>
+														<?php endforeach; ?>
 													</select>
 													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
 														<?php if (isset($_SESSION['errors']['college'])): ?>
@@ -330,7 +385,7 @@ try {
 														<?php if (isset($_SESSION['errors']['course'])): ?>
 															<?= htmlspecialchars($_SESSION['errors']['course']); ?>
 														<?php endif; ?>
-													</div>		
+													</div>
 												</div>
 											</div>
 											<div class="col-md-6 mb-3">

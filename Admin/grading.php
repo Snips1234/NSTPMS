@@ -6,51 +6,99 @@ require "Partials/sidebar.php";
 require "../includes/functions.php";
 
 // Define pagination and search variables
-$limit = 10; // Number of entries per page
+// Define variables for pagination and filters
+$limit = 10;
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
-
-// Handle search query
+$year_level = isset($_GET['year_level']) ? $_GET['year_level'] : '';
+$college = isset($_GET['college']) ? $_GET['college'] : '';
+$sex = isset($_GET['sex']) ? $_GET['sex'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+$year = isset($_GET['year']) ? $_GET['year'] : '';
 
-// Database query with search and pagination
 try {
 	require_once('../connection/dsn.php');
 	$pdo = getDatabaseConnection();
 
-	// Prepare the base query
-	$query = "SELECT std_id, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province, c_status, religion, email_add, cp_number, college, y_level, course, major, quarter_1_grade_sem_1, quarter_1_percent_sem_1, quarter_2_grade_sem_1, quarter_2_percent_sem_1, average_sem_1, average_percent_sem_1, remarks_sem_1,school_year_sem_1, quarter_1_grade_sem_2, quarter_1_percent_sem_2, quarter_2_grade_sem_2, quarter_2_percent_sem_2, average_sem_2, average_percent_sem_2, remarks_sem_2,school_year_sem_2,serial_number,cpce, cpce_cp_number, nstp_component, created_at FROM tbl_20_columns_cwts";
 
-	// Add search condition if provided
+	$query = "SELECT * FROM tbl_20_columns WHERE 1=1";
+
+
 	if ($search) {
-		$query .= " WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
+		$query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+	if ($year_level) {
+		$query .= " AND y_level = :year_level";
+	}
+	if ($college) {
+		$query .= " AND college = :college";
+	}
+	if ($sex) {
+		$query .= " AND sex = :sex";
+	}
+	if ($year) {
+		$query .= " AND (school_year_sem_1 LIKE :year OR school_year_sem_2 LIKE :year)";
 	}
 
-	$query .= " ORDER BY std_id DESC LIMIT :limit OFFSET :offset";
-
+	// Add order and limit clauses
+	$query .= " ORDER BY l_name ASC LIMIT $limit OFFSET $offset";
 	$stmt = $pdo->prepare($query);
 
-	// Bind search parameter if provided
+	// Bind values for the main query
 	if ($search) {
-		$stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+		$stmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($year_level) {
+		$stmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
+	}
+	if ($college) {
+		$stmt->bindValue(':college', $college, PDO::PARAM_STR);
+	}
+	if ($sex) {
+		$stmt->bindValue(':sex', $sex, PDO::PARAM_STR);
+	}
+	if ($year) {
+		$stmt->bindValue(':year', '%' . $year . '%', PDO::PARAM_STR);
 	}
 
-	$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-	$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
 	$stmt->execute();
 	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	// Get total number of entries for pagination
-	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns_cwts";
+	// Count query to get total number of entries
+	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1";
 	if ($search) {
-		$countQuery .= " WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
+		$countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+	if ($year_level) {
+		$countQuery .= " AND y_level = :year_level";
+	}
+	if ($college) {
+		$countQuery .= " AND college = :college";
+	}
+	if ($sex) {
+		$countQuery .= " AND sex = :sex";
+	}
+	if ($year) {
+		$countQuery .= " AND (school_year_sem_1 LIKE :year OR school_year_sem_2 LIKE :year)";
 	}
 
 	$countStmt = $pdo->prepare($countQuery);
 
-	// Bind search parameter if provided
+	// Bind values for the count query
 	if ($search) {
-		$countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+		$countStmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($year_level) {
+		$countStmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
+	}
+	if ($college) {
+		$countStmt->bindValue(':college', $college, PDO::PARAM_STR);
+	}
+	if ($sex) {
+		$countStmt->bindValue(':sex', $sex, PDO::PARAM_STR);
+	}
+	if ($year) {
+		$countStmt->bindValue(':year', '%' . $year . '%', PDO::PARAM_STR);
 	}
 
 	$countStmt->execute();
@@ -75,12 +123,12 @@ try {
 		<div class="container-fluid">
 			<div class="row mb-2">
 				<div class="col-sm-6">
-					<h3 class="m-0">CWTS Grades</h3>
+					<h3 class="m-0">Grades</h3>
 				</div><!-- /.col -->
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-						<li class="breadcrumb-item">CWTS Grades</li>
+						<li class="breadcrumb-item">Grades</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -102,24 +150,61 @@ try {
 									</button>
 								</div>
 								<!-- <h3 class="card-title">CWTS Student Grades</h3> -->
-								<div class="mt-5 d-flex justify-content-between align-items-center">
-									<div>
-										<a href="grade_report.php" class="btn btn-primary" style="width: 160px !important;">
-											Report
-										</a>
-										<a href="cwts_make_grade.php" class="btn btn-primary" style="width: 160px !important;">
+								<div class="mt-5">
+									<div class="row">
+										<a href="grading_sheet.php" class="btn btn-primary" style="width: 160px !important;">
 											Grading sheet
 										</a>
 									</div>
 									<form method="get" action="" class="">
-										<div class="input-group">
-											<input type="text" name="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
-											<div class="input-group-append">
-												<button class="btn btn-primary" type="submit">Search</button>
+										<div class="row">
+											<div class="col-md-5 mt-1">
+												<label for="year" class="form-label text-secondary">Year</label>
+												<input type="text" name="year" id="year" class="form-control" placeholder="Year..." value="<?php echo htmlspecialchars($year); ?>">
+											</div>
+											<div class="col-md-7 mt-1">
+												<label for="search" class="form-label text-secondary">Search</label>
+												<input type="text" name="search" id="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
+											</div>
+
+										</div>
+										<div class="row">
+											<div class="col-md-3 mt-1">
+												<label for="sex" class="form-label text-secondary">Sex</label>
+												<select name="sex" id="sex" class="form-control">
+													<option value="">All</option>
+													<option value="male" <?= isset($_GET['sex']) && $_GET['sex'] ==  'male' ? 'selected' : ''; ?>>Male</option>
+													<option value="female" <?= isset($_GET['sex']) && $_GET['sex'] ==  'female' ? 'selected' : ''; ?>>Female</option>
+												</select>
+											</div>
+											<div class="col-md-3 mt-1">
+												<label for="year_level" class="form-label text-secondary">Year level</label>
+												<select name="year_level" id="year_level" class="form-control">
+													<option value="">All</option>
+													<option value="1" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '1' ? 'selected' : ''; ?>>1st Year</option>
+													<option value="2" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '2' ? 'selected' : ''; ?>>2nd Year</option>
+													<option value="3" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '3' ? 'selected' : ''; ?>>3rd Year</option>
+													<option value="4" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '4' ? 'selected' : ''; ?>>4th Year</option>
+												</select>
+											</div>
+
+											<div class="col-md-3 mt-1">
+												<label for="college" class="form-label text-secondary">College</label>
+												<select name="college" id="college" class="form-control">
+													<option value="">All</option>
+													<option value="agriculture" <?= isset($_GET['college']) && $_GET['college'] ==  'agriculture' ? 'selected' : ''; ?>>AGRICULTURE</option>
+													<option value="arts & science" <?= isset($_GET['college']) && $_GET['college'] ==  'arts & science' ? 'selected' : ''; ?>>ARTS & SCIENCE</option>
+													<option value="education" <?= isset($_GET['college']) && $_GET['college'] ==  'education' ? 'selected' : ''; ?>>EDUCATION</option>
+													<option value="engineering" <?= isset($_GET['college']) && $_GET['college'] ==  'engineering' ? 'selected' : ''; ?>>ENGINEERING</option>
+													<option value="industrial technology" <?= isset($_GET['college']) && $_GET['college'] ==  'industrial technology' ? 'selected' : ''; ?>>INDUSTRIAL TECHNOLOGY</option>
+													<!-- Add more course options as needed -->
+												</select>
+											</div>
+											<div class="col-md-3 mt-1 align-self-end">
+												<button class="btn btn-primary w-100" type="submit">Filter</button>
 											</div>
 										</div>
 									</form>
-
 								</div>
 							</div>
 							<div class="card-body p-0">
@@ -143,15 +228,15 @@ try {
 												<th class="no-wrap f-12 text-center">Extension Name</th>
 												<th class="no-wrap f-12 text-center">Middle Name</th>
 												<!-- Sem 1 -->
-												<th class="no-wrap f-12 text-center">Quarter 1</th>
-												<th class="no-wrap f-12">Quarter 2</th>
-												<th class="no-wrap f-12">Average</th>
+												<th class="no-wrap f-12 text-center">Midterm grade</th>
+												<th class="no-wrap f-12">Final grade</th>
+												<th class="no-wrap f-12">Final rating</th>
 												<th class="no-wrap f-12">Remarks</th>
 												<th class="no-wrap f-12">School Year</th>
 												<!-- Sem 2 -->
-												<th class="no-wrap f-12 text-center">Quarter 1</th>
-												<th class="no-wrap f-12  text-center">Quarter 2</th>
-												<th class="no-wrap f-12  text-center">Average</th>
+												<th class="no-wrap f-12 text-center">Midterm grade</th>
+												<th class="no-wrap f-12  text-center">Final grade</th>
+												<th class="no-wrap f-12  text-center">Final rating</th>
 												<th class="no-wrap f-12  text-center">Remarks</th>
 												<th class="no-wrap f-12">School Year</th>
 											</tr>
@@ -200,6 +285,10 @@ try {
 														<td class="no-wrap f-12 text-center <?= !empty($row['remarks_sem_2']) ? ($row['remarks_sem_2'] === 'Passed' ? 'table-success' : 'table-danger') : '' ?>"><?php echo htmlspecialchars(strtoupper($row['serial_number'])); ?></td>
 													</tr>
 												<?php endforeach; ?>
+											<?php else: ?>
+												<tr>
+													<td class="text-center " colspan="10">No entries found</td>
+												</tr>
 											<?php endif; ?>
 										</tbody>
 									</table>
@@ -209,7 +298,11 @@ try {
 								<div class="row">
 									<div class="col-sm-12 col-md-5">
 										<div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-											Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+											<?php if ($totalEntries > 0): ?>
+												Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+											<?php else: ?>
+												No entries found
+											<?php endif; ?>
 										</div>
 									</div>
 									<div class="col-sm-12 col-md-7">
@@ -217,7 +310,7 @@ try {
 											<ul class="pagination float-right">
 												<!-- Previous Button -->
 												<li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
-													<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+													<a href="?search=<?php echo htmlspecialchars($search); ?>&year_level=<?php echo htmlspecialchars($year_level); ?>&college=<?php echo htmlspecialchars($college); ?>&sex=<?php echo htmlspecialchars($sex); ?>&year=<?php echo htmlspecialchars($year); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
 												</li>
 												<!-- Page Numbers -->
 												<?php for ($i = 1; $i <= $totalPages; $i++): ?>

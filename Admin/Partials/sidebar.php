@@ -2,7 +2,7 @@
 <aside class="main-sidebar sidebar-dark-primary elevation-4">
   <!-- Brand Logo -->
   <a href="./dashboard.php" class="brand-link">
-    <!-- <img src="../Images/school logo-modified.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8"> -->
+    <img src="../Images/school logo-modified.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
     <span class="brand-text font-weight-light">NSTP MS</span>
   </a>
 
@@ -28,49 +28,50 @@
           </a>
         </li>
         <li class="nav-item">
-          <a href="./nstp_data_field.php" class="nav-link">
-            <i class="fa fa-list" aria-hidden="true"></i>
-            <p>
-              NSTP Data Field
-            </p>
-          </a>
-        </li>
-        <li class="nav-item ">
-          <a href="#" class="nav-link">
+          <a href="./grading.php" class="nav-link">
             <i class="fas fa-chart-line"></i>
             <p>
-              Grading
-              <i class="right fas fa-angle-left"></i>
+              Grades
             </p>
           </a>
-          <ul class="nav nav-treeview">
-            <li class="nav-item">
-              <a href="../Admin/cwts_grading.php" class="nav-link">
-                <i class="far fa-chart-bar"></i>
-                <p>Cwts Grades</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="../Admin/lts_grading.php" class="nav-link">
-                <i class="far fa-chart-bar"></i>
-                <p>Lts Grades</p>
-              </a>
-            </li>
-            <li class="nav-item">
-              <a href="../Admin/rotc_grading.php" class="nav-link">
-                <i class="far fa-chart-bar"></i>
-                <p>ROTC Grades</p>
-              </a>
-            </li>
-          </ul>
         </li>
         <li class="nav-item">
-          <a href="./report.php" class="nav-link">
-            <i class="fa fa-print" aria-hidden="true"></i>
+          <a href="./serial_number.php" class="nav-link">
+            <i class="fa fa-asterisk" aria-hidden="true"></i>
+            <p>
+              Serial number
+            </p>
+          </a>
+        </li>
+
+        <li class="nav-item ">
+          <a href="#" class="nav-link">
+            <i class="nav-icon fa fa-print" aria-hidden="true"></i>
             <p>
               Reports
             </p>
+            <i class="right fas fa-angle-left"></i>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="./nstp_data_field.php" class="nav-link">
+                <i class="fa fa-user" aria-hidden="true"></i>
+                <p>NSTP Data Field</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../Admin/report_grades.php" class="nav-link">
+                <i class="fas fa-chart-line"></i>
+                <p>Grades Report</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../Admin/report_serial_number.php" class="nav-link">
+                <i class="fa fa-asterisk" aria-hidden="true"></i>
+                <p>Serial number</p>
+              </a>
+            </li>
+          </ul>
         </li>
       </ul>
     </nav>

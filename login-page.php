@@ -66,7 +66,7 @@ session_start();
             <a href="index.php" type="button" class="d-block mb-3 text-black">
               <i class="fa fa-arrow-left fs-5" aria-hidden="true"></i>
             </a>
-            <!-- <img src="./Images/school logo-modified.png" alt="School logo" width="48px" height="48px"> -->
+            <img src="./Images/school logo-modified.png" alt="School logo" width="48px" height="48px">
             <h2 class="mt-2">Sign in</h2>
             <p>Use your account</p>
           </div>
@@ -95,7 +95,7 @@ session_start();
               </div>
               <!-- submit -->
               <input type="submit" name="login" class="btn border-0 login_btn text-white w-100 m-0 py-2">
-            <!--   <div class="w-100 d-flex justify-content-center mt-4 w_500">
+              <!--   <div class="w-100 d-flex justify-content-center mt-4 w_500">
                 <p>Don't have an account yet? <a href="sign-up-as.php">Sign up</a></p>
               </div> -->
             </form>

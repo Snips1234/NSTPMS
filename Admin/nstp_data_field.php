@@ -5,89 +5,105 @@ require "Partials/navbar.php";
 require "Partials/sidebar.php";
 require "../includes/functions.php";
 
-// Define pagination and search variables
 $limit = 10; // Number of entries per page
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $limit;
-
-// Handle search query
+$year_level = isset($_GET['year_level']) ? $_GET['year_level'] : '';
+$college = isset($_GET['college']) ? $_GET['college'] : '';
+$sex = isset($_GET['sex']) ? $_GET['sex'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
+$component = isset($_GET['nstp_component']) ? $_GET['nstp_component'] : '';
 
-// Database query with search and pagination
 try {
 	require_once('../connection/dsn.php');
 	$pdo = getDatabaseConnection();
 
-	// Prepare the base query with UNION ALL
-	$query = "
-    SELECT std_id, nstp_grad_year, serial_number, HEI_name, type_of_HEI, region, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-           c_status, religion, email_add, cp_number, college, y_level, course, major, 
-           cpce, cpce_cp_number, nstp_component, username, pass
-    FROM tbl_20_columns_cwts
-    WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
+	$query = "SELECT * FROM tbl_20_columns WHERE 1=1";
 
-    UNION ALL
+	if ($search) {
+		$query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
 
-    SELECT std_id, nstp_grad_year, serial_number, HEI_name, type_of_HEI, region, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-           c_status, religion, email_add, cp_number, college, y_level, course, major, 
-           cpce, cpce_cp_number, nstp_component, username, pass
-    FROM tbl_20_columns_lts
-    WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
+	if ($year_level) {
+		$query .= " AND y_level = :year_level";
+	}
 
-    UNION ALL
+	if ($college) {
+		$query .= " AND college = :college";
+	}
 
-    SELECT std_id, nstp_grad_year, serial_number, HEI_name, type_of_HEI, region, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-           c_status, religion, email_add, cp_number, college, y_level, course, major, 
-           cpce, cpce_cp_number, nstp_component, username, pass
-    FROM tbl_20_columns_rotc
-    WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
+	if ($sex) {
+		$query .= " AND sex = :sex";
+	}
 
-    ORDER BY l_name DESC
-    LIMIT :limit OFFSET :offset
-";
+	if ($component) {
+		$query .= " AND nstp_component = :nstp_component";
+	}
+
+	$query .= " ORDER BY l_name ASC LIMIT $limit OFFSET $offset";
 
 	$stmt = $pdo->prepare($query);
 
-	// Bind search parameter if provided
-	$stmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
-	$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
-	$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
-	$stmt->execute();
+	if ($search) {
+		$stmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($year_level) {
+		$stmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
+	}
+	if ($college) {
+		$stmt->bindValue(':college', $college, PDO::PARAM_STR);
+	}
+	if ($sex) {
+		$stmt->bindValue(':sex', $sex, PDO::PARAM_STR);
+	}
+	if ($component) {
+		$stmt->bindValue(':nstp_component', $component, PDO::PARAM_STR);
+	}
 
+	$stmt->execute();
 	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	// Get total number of entries for pagination
-	$countQuery = "
-    SELECT COUNT(*) as total FROM (
-        SELECT l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-               c_status, religion, email_add, cp_number, college, y_level, course, major, 
-               cpce, cpce_cp_number, nstp_component, username, pass
-        FROM tbl_20_columns_cwts
-        WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
+	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1";
 
-        UNION ALL
+	if ($search) {
+		$countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
 
-        SELECT l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-               c_status, religion, email_add, cp_number, college, y_level, course, major, 
-               cpce, cpce_cp_number, nstp_component, username, pass
-        FROM tbl_20_columns_lts
-        WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
+	if ($year_level) {
+		$countQuery .= " AND y_level = :year_level";
+	}
 
-        UNION ALL
+	if ($college) {
+		$countQuery .= " AND college = :college";
+	}
 
-        SELECT l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province,
-               c_status, religion, email_add, cp_number, college, y_level, course, major, 
-               cpce, cpce_cp_number, nstp_component, username, pass
-        FROM tbl_20_columns_rotc
-        WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search
-    ) AS combined
-";
+	if ($sex) {
+		$countQuery .= " AND sex = :sex";
+	}
 
+	if ($component) {
+		$countQuery .= " AND nstp_component = :nstp_component";
+	}
 
 	$countStmt = $pdo->prepare($countQuery);
 
-	// Bind search parameter if provided
-	$countStmt->bindValue(':search', "%$search%", PDO::PARAM_STR);
+	if ($search) {
+		$countStmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($year_level) {
+		$countStmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
+	}
+	if ($college) {
+		$countStmt->bindValue(':college', $college, PDO::PARAM_STR);
+	}
+
+	if ($sex) {
+		$countStmt->bindValue(':sex', $sex, PDO::PARAM_STR);
+	}
+
+	if ($component) {
+		$countStmt->bindValue(':nstp_component', $component, PDO::PARAM_STR);
+	}
 
 	$countStmt->execute();
 	$totalEntries = $countStmt->fetchColumn();
@@ -95,7 +111,6 @@ try {
 } catch (PDOException $e) {
 	echo 'Connection failed: ' . $e->getMessage();
 }
-
 ?>
 
 
@@ -130,26 +145,73 @@ try {
 										<i class="fas fa-minus"></i>
 									</button>
 								</div>
-								<h3 class="card-title">NSTP Data Field</h3>
-								<div class="mt-5 ">
-									<!-- d-flex justify-content-end align-items-center -->
-									<!-- <a href="add_cwts.php" class="btn btn-primary" style="width: 160px !important;">
-										Registration
-									</a> -->
+								<div class="mt-5">
+									<div class="row">
+										<a href="report.php" class="btn btn-primary" style="width: 160px !important;">
+											Report
+										</a>
+									</div>
 									<form method="get" action="" class="">
-										<div class="input-group">
-											<input type="text" name="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
-											<div class="input-group-append">
-												<button class="btn btn-primary" type="submit">Search</button>
+										<div class="row">
+											<div class="col-md-3 mt-1">
+												<div class="control">
+													<label for="nstp_component" class="form-label text-secondary">NSTP Component</label>
+													<select name="nstp_component" id="nstp_component" class="form-control">
+														<option value="">All</option>
+														<option value="CWTS" <?= isset($_GET['nstp_component']) && $_GET['nstp_component'] ==  'CWTS' ? 'selected' : ''; ?>>CWTS</option>
+														<option value="LTS" <?= isset($_GET['nstp_component']) && $_GET['nstp_component'] ==  'LTS' ? 'selected' : ''; ?>>LTS</option>
+														<option value="ROTC" <?= isset($_GET['nstp_component']) && $_GET['nstp_component'] ==  'ROTC' ? 'selected' : ''; ?>>ROTC</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-9 mt-1">
+												<label for="search" class="form-label text-secondary">Search</label>
+												<input type="text" name="search" id="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
+											</div>
+
+										</div>
+										<div class="row">
+											<div class="col-md-3 mt-1">
+												<label for="sex" class="form-label text-secondary">Sex</label>
+												<select name="sex" id="sex" class="form-control">
+													<option value="">All</option>
+													<option value="male" <?= isset($_GET['sex']) && $_GET['sex'] ==  'male' ? 'selected' : ''; ?>>Male</option>
+													<option value="female" <?= isset($_GET['sex']) && $_GET['sex'] ==  'female' ? 'selected' : ''; ?>>Female</option>
+												</select>
+											</div>
+											<div class="col-md-3 mt-1">
+												<label for="year_level" class="form-label text-secondary">Year level</label>
+												<select name="year_level" id="year_level" class="form-control">
+													<option value="">All</option>
+													<option value="1" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '1' ? 'selected' : ''; ?>>1st Year</option>
+													<option value="2" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '2' ? 'selected' : ''; ?>>2nd Year</option>
+													<option value="3" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '3' ? 'selected' : ''; ?>>3rd Year</option>
+													<option value="4" <?= isset($_GET['year_level']) && $_GET['year_level'] ==  '4' ? 'selected' : ''; ?>>4th Year</option>
+												</select>
+											</div>
+
+											<div class="col-md-3 mt-1">
+												<label for="college" class="form-label text-secondary">College</label>
+												<select name="college" id="college" class="form-control">
+													<option value="">All</option>
+													<option value="agriculture" <?= isset($_GET['college']) && $_GET['college'] ==  'agriculture' ? 'selected' : ''; ?>>AGRICULTURE</option>
+													<option value="arts & science" <?= isset($_GET['college']) && $_GET['college'] ==  'arts & science' ? 'selected' : ''; ?>>ARTS & SCIENCE</option>
+													<option value="education" <?= isset($_GET['college']) && $_GET['college'] ==  'education' ? 'selected' : ''; ?>>EDUCATION</option>
+													<option value="engineering" <?= isset($_GET['college']) && $_GET['college'] ==  'engineering' ? 'selected' : ''; ?>>ENGINEERING</option>
+													<option value="industrial technology" <?= isset($_GET['college']) && $_GET['college'] ==  'industrial technology' ? 'selected' : ''; ?>>INDUSTRIAL TECHNOLOGY</option>
+													<!-- Add more course options as needed -->
+												</select>
+											</div>
+											<div class="col-md-3 mt-1 align-self-end">
+												<button class="btn btn-primary w-100" type="submit">Filter</button>
 											</div>
 										</div>
 									</form>
-
 								</div>
 							</div>
 							<div class="card-body p-0">
 								<!-- Search Form -->
-								<div class="table-striped table-responsive">
+								<div class="table-striped table-responsive table-bordered">
 									<table class="table m-0">
 										<thead>
 											<tr>
@@ -184,33 +246,48 @@ try {
 										<tbody>
 											<?php if (!empty($results)): ?>
 												<?php foreach ($results as $row): ?>
+													<?php
+													$isPassed = (!empty($row['remarks_sem_1']) && !empty($row['remarks_sem_2'])) ? (($row['remarks_sem_1'] === 'Passed' && $row['remarks_sem_2'] === 'Passed') ? 'table-success' : 'table-danger') : ''; ?>
 													<tr>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['std_id']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['nstp_grad_year']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['nstp_component']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['region']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['serial_number']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['l_name']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['f_name']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['ex_name']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['m_name']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['b_date']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['sex']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['st_brgy']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['municipality']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['province']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['HEI_name']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['type_of_HEI']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['course']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['y_level']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['email_add']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['cp_number']); ?></td>
-														<!-- <td class="no-wrap f-12"><?php echo htmlspecialchars($row['c_status']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['religion']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['college']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['major']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['cpce']); ?></td>
-														<td class="no-wrap f-12"><?php echo htmlspecialchars($row['cpce_cp_number']); ?></td> -->
+														<td class="no-wrap f-12 <?= $isPassed ?>"><?php echo htmlspecialchars($row['std_id']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable conditional" data-id="<?= $row['std_id'] ?>" data-column='nstp_grad_year' data-type='input' data-title='NSTP graduation year'><?php echo htmlspecialchars($row['nstp_grad_year']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='nstp_component' data-type='dropdown' data-title='NSTP component'><?php echo htmlspecialchars($row['nstp_component']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='region' data-type='dropdown' data-title='region'><?php echo htmlspecialchars($row['region']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable conditional" data-id="<?= $row['std_id'] ?>" data-column='serial_number' data-type='input' data-title='serial number'><?php echo htmlspecialchars($row['serial_number']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='l_name' data-type='input' data-title='last name'><?php echo htmlspecialchars($row['l_name']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='f_name' data-type='input' data-title='first name'><?php echo htmlspecialchars($row['f_name']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='ex_name' data-type='input' data-title='name extension'><?php echo htmlspecialchars($row['ex_name']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='m_name' data-type='input' data-title='middle name'><?php echo htmlspecialchars($row['m_name']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='b_date' data-type='date_time' data-title='birthday'><?php echo htmlspecialchars($row['b_date']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='sex' data-type='dropdown' data-title='sex'><?php echo htmlspecialchars($row['sex']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='st_brgy' data-type='input' data-title='street/barangay'><?php echo htmlspecialchars($row['st_brgy']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='municipality' data-type='input' data-title='municipality'><?php echo htmlspecialchars($row['municipality']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='province' data-type='input' data-title='province'><?php echo htmlspecialchars($row['province']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='HEI_name' data-type='input' data-title='HEI name'><?php echo htmlspecialchars($row['HEI_name']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='type_of_HEI' data-type='dropdown' data-title='type of HEI'><?php echo htmlspecialchars($row['type_of_HEI']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='course' data-type='dropdown' data-title='course'><?php echo htmlspecialchars($row['course']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='y_level' data-type='dropdown' data-title='year level'><?php echo htmlspecialchars($row['y_level']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='email_add' data-type='input' data-title='email address'><?php echo htmlspecialchars($row['email_add']); ?></td>
+
+														<td class="no-wrap f-12 <?= $isPassed ?> editable" data-id="<?= $row['std_id'] ?>" data-column='cp_number' data-type='input' data-title='contact number'><?php echo htmlspecialchars($row['cp_number']); ?></td>
 													</tr>
 												<?php endforeach; ?>
 											<?php else: ?>
@@ -226,7 +303,11 @@ try {
 								<div class="row">
 									<div class="col-sm-12 col-md-5">
 										<div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-											Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+											<?php if ($totalEntries > 0): ?>
+												Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+											<?php else: ?>
+												No entries found
+											<?php endif; ?>
 										</div>
 									</div>
 									<div class="col-sm-12 col-md-7">
@@ -234,7 +315,8 @@ try {
 											<ul class="pagination float-right">
 												<!-- Previous Button -->
 												<li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
-													<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+													<a href="?search=<?php echo htmlspecialchars($search); ?>&year_level=<?php echo htmlspecialchars($year_level); ?>&college=<?php echo htmlspecialchars($college); ?>&sex=<?php echo htmlspecialchars($sex); ?>&nstp_component=<?php echo htmlspecialchars($component); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+
 												</li>
 												<!-- Page Numbers -->
 												<?php for ($i = 1; $i <= $totalPages; $i++): ?>
@@ -265,47 +347,504 @@ try {
 <!-- Modal -->
 
 <!-- view modal -->
-<div class="modal fade p-0" id="view_modal" style="display: none;" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered ">
+<!-- <div>
+	<div class="modal fade p-0" id="view_modal" style="display: none;" aria-hidden="true">
+		<div class="modal-dialog modal-lg modal-dialog-centered ">
+			<div class="modal-content">
+				<div class="modal-header bg-primary">
+					<h4 class="modal-title">View Profile</h4>
+					<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body p-0">
+				</div>
+				<div class="modal-footer justify-content-end">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div class="modal fade p-0" id="delete_modal" style="display: none;" aria-hidden="true">
+		<div class="modal-dialog  modal-dialog-centered ">
+			<div class="modal-content">
+				<div class="modal-header bg-danger">
+					<h4 class="modal-title">Delete profile</h4>
+					<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+						<span aria-hidden="true">×</span>
+					</button>
+				</div>
+				<div class="modal-body mb-2">
+					<h4>Are you sure you want to delete this profile?</h4>
+				</div>
+				<div class="modal-footer justify-content-end">
+					<form action="../query.php" method="post">
+						<input type="hidden" id="std_id" name="std_id">
+						<input type="hidden" id="table_name" name="table_name">
+						<button type="submit" class="btn btn-danger" name="admin-delete-cwts" id="admin-delete-cwts">Confirm</button>
+						<button type=" button" class="btn btn-default" data-dismiss="modal">Close</button>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div> -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
 		<div class="modal-content">
-			<div class="modal-header bg-primary">
-				<h4 class="modal-title">View Profile</h4>
-				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">×</span>
+			<div class="modal-header">
+				<h5 class="modal-title" id="editModalLabel">Update NTSP Graduation year</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body p-0">
+			<div class="modal-body">
+
+				<input type="text" class="form-control" id="cellContent">
+				<input type="hidden" id="cellId">
+				<input type="hidden" id="cellColumn">
 			</div>
-			<div class="modal-footer justify-content-end">
-				<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-primary" id="save_gy_sn" name="save_gy_sn">Save changes</button>
 			</div>
 		</div>
 	</div>
 </div>
 
-<div class="modal fade p-0" id="delete_modal" style="display: none;" aria-hidden="true">
-	<div class="modal-dialog  modal-dialog-centered ">
-		<div class="modal-content">
-			<div class="modal-header bg-danger">
-				<h4 class="modal-title">Delete profile</h4>
-				<button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">×</span>
-				</button>
-			</div>
-			<div class="modal-body mb-2">
-				<h4>Are you sure you want to delete this profile?</h4>
-			</div>
-			<div class="modal-footer justify-content-end">
-				<form action="../query.php" method="post">
-					<input type="hidden" id="std_id" name="std_id">
-					<input type="hidden" id="table_name" name="table_name">
-					<button type="submit" class="btn btn-danger" name="admin-delete-cwts" id="admin-delete-cwts">Confirm</button>
-					<button type=" button" class="btn btn-default" data-dismiss="modal">Close</button>
-				</form>
-			</div>
-		</div>
-	</div>
-</div>
+
+<!-- <script>
+	$(document).ready(function() {
+		// Handle double-click on table cell
+		$('td').click(function() {
+			if ($(this).hasClass('editable') && $(this).hasClass('table-success') && $(this).hasClass('conditional')) {
+				var cellContent = $(this).text().trim();
+				var cellId = $(this).data('id');
+				var cellColumn = $(this).data('column');
+				var cellIndex = $(this).index();
+				var cellTitle = $(this).data('title').toUpperCase();
+
+				$('#cellContent').val(cellContent);
+				$('#cellId').val(cellId);
+				$('#cellColumn').val(cellColumn);
+				$('#editModalLabel').text(cellTitle);
+
+				$('#editModal').modal('show');
+			} else if ($(this).hasClass('editable') && $(this).hasClass('conditional')) {
+				toastr.error("Can't update this data!");
+			} else if ($(this).hasClass('editable')) {
+				var cellContent = $(this).text().trim();
+				var cellId = $(this).data('id');
+				var cellColumn = $(this).data('column');
+				var cellIndex = $(this).index();
+				var cellTitle = $(this).data('title').toUpperCase();
+
+				$('#cellContent').val(cellContent);
+				$('#cellId').val(cellId);
+				$('#cellColumn').val(cellColumn);
+				$('#editModalLabel').text(cellTitle);
+
+				$('#editModal').modal('show');
+			}
+		});
+
+		// Handle save button click
+		$('#save_gy_sn').click(function() {
+			var updatedContent = $('#cellContent').val();
+			var cellId = $('#cellId').val();
+			var cellColumn = $('#cellColumn').val();
+			$.ajax({
+				url: '../query.php', // PHP file to process the update
+				type: 'POST',
+				data: {
+					id: cellId,
+					content: updatedContent,
+					column: cellColumn,
+					'save_gy_sn': true
+				},
+				success: function(response) {
+					// Update the cell in the table with new content
+					var res = JSON.parse(response);
+					if (res.status === 'success') {
+						$('td[data-id="' + cellId + '"][data-column="' + cellColumn + '"]').text(updatedContent);
+						$('#editModal').modal('hide');
+						toastr.success('Data successfully updated')
+					} else {
+						alert(res.message); // Show error message from the server
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error('Error updating cell:', textStatus, errorThrown);
+					alert('Failed to update the cell. Please try again.');
+				}
+			});
+		});
+	});
+</script> -->
+
+<!-- <script>
+	$(document).ready(function() {
+		$('td').click(function() {
+			if ($(this).hasClass('editable') && $(this).hasClass('table-success') && $(this).hasClass('conditional')) {
+				var cellContent = $(this).text().trim();
+				var cellId = $(this).data('id');
+				var cellColumn = $(this).data('column');
+				var cellTitle = $(this).data('title').toUpperCase();
+				var cellType = $(this).data('type');
+				var cellIndex = $(this).index();
+
+				// Set hidden fields
+				$('#cellId').val(cellId);
+				$('#cellColumn').val(cellColumn);
+				$('#editModalLabel').text(cellTitle);
+
+				// Handle different input types based on cellType
+				if (cellType === 'dropdown') {
+					// Show a select element
+					if (cellIndex === 2) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="CWTS" ${cellContent === 'CWTS' ? 'selected' : ''}>CWTS</option>
+										<option value="LTS" ${cellContent === 'LTS' ? 'selected' : ''}>LTS</option>
+										<option value="ROTC" ${cellContent === 'ROTC' ? 'selected' : ''}>ROTC</option>
+								</select>
+						`);
+					} else if (cellIndex === 10) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="Male" ${cellContent === 'Male' ? 'selected' : ''}>Male</option>
+										<option value="Female" ${cellContent === 'Female' ? 'selected' : ''}>Female</option>
+								</select>
+						`);
+					} else if (cellIndex === 15) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="SUCs" ${cellContent === 'SUCs' ? 'selected' : ''}>SUCs</option>
+										<option value="LUCs" ${cellContent === 'LUCs' ? 'selected' : ''}>LUCs</option>
+										<option value="OGs" ${cellContent === 'OGs' ? 'selected' : ''}>OGs</option>
+										<option value="Private HEI" ${cellContent === 'Private HEI' ? 'selected' : ''}>Private HEI</option>
+								</select>
+						`);
+					} else if (cellIndex === 17) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="1" ${cellContent === '1' ? 'selected' : ''}>1st Year</option>
+										<option value="2" ${cellContent === '2' ? 'selected' : ''}>2nd Year</option>
+										<option value="3" ${cellContent === '3' ? 'selected' : ''}>3rd Year</option>
+										<option value="4" ${cellContent === '4' ? 'selected' : ''}>4th Year</option>
+								</select>
+						`);
+					} else {
+						$('#cellContent').replaceWith('<select id="cellContent" class="form-control"></select>');
+
+						$.ajax({
+							url: '../includes/populate.php',
+							type: 'POST',
+							data: {
+								column: cellColumn,
+								id: cellId
+							},
+							success: function(response) {
+								// Parse JSON response from PHP
+								var options = JSON.parse(response);
+
+								// Clear existing options
+								$('#cellContent').empty();
+
+								// Populate the select dropdown
+								$.each(options, function(value, text) {
+									$('#cellContent').append($('<option>', {
+										value: value,
+										text: text
+									}));
+								});
+
+								// Set the selected option to match cellContent
+								$('#cellContent').val(cellContent);
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								console.error('Error fetching dropdown options:', textStatus, errorThrown);
+								alert('Failed to load options. Please try again.');
+							}
+						});
+					}
+				} else if (cellType === 'date_time') {
+					// Show a date picker input
+					$('#cellContent').replaceWith('<input type="date" class="form-control" id="cellContent">');
+					$('#cellContent').val(cellContent);
+
+					// Initialize date picker (assuming you're using a date picker plugin like jQuery UI)
+					$('#cellContent').datepicker({
+						dateFormat: 'yy-mm-dd' // Adjust format as needed
+					});
+				} else {
+					// Default text input for other cases
+					$('#cellContent').replaceWith('<input type="text" class="form-control" id="cellContent">');
+					$('#cellContent').val(cellContent);
+				}
+
+				// Show the modal
+				$('#editModal').modal('show');
+			} else if ($(this).hasClass('editable') && $(this).hasClass('conditional')) {
+				toastr.error("Can't update this data!");
+			} else if ($(this).hasClass('editable')) {
+				var cellContent = $(this).text().trim();
+				var cellId = $(this).data('id');
+				var cellColumn = $(this).data('column');
+				var cellTitle = $(this).data('title').toUpperCase();
+				var cellType = $(this).data('type');
+				var cellIndex = $(this).index();
+
+				// Set hidden fields
+				$('#cellId').val(cellId);
+				$('#cellColumn').val(cellColumn);
+				$('#editModalLabel').text(cellTitle);
+
+				// Handle different input types based on cellType
+				if (cellType === 'dropdown') {
+					// Show a select element
+					if (cellIndex === 2) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="CWTS" ${cellContent === 'CWTS' ? 'selected' : ''}>CWTS</option>
+										<option value="LTS" ${cellContent === 'LTS' ? 'selected' : ''}>LTS</option>
+										<option value="ROTC" ${cellContent === 'ROTC' ? 'selected' : ''}>ROTC</option>
+								</select>
+						`);
+					} else if (cellIndex === 10) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="Male" ${cellContent === 'Male' ? 'selected' : ''}>Male</option>
+										<option value="Female" ${cellContent === 'Female' ? 'selected' : ''}>Female</option>
+								</select>
+						`);
+					} else if (cellIndex === 15) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="SUCs" ${cellContent === 'SUCs' ? 'selected' : ''}>SUCs</option>
+										<option value="LUCs" ${cellContent === 'LUCs' ? 'selected' : ''}>LUCs</option>
+										<option value="OGs" ${cellContent === 'OGs' ? 'selected' : ''}>OGs</option>
+										<option value="Private HEI" ${cellContent === 'Private HEI' ? 'selected' : ''}>Private HEI</option>
+								</select>
+						`);
+					} else if (cellIndex === 17) {
+						$('#cellContent').replaceWith(`
+								<select id="cellContent" class="form-control">
+										<option value="1" ${cellContent === '1' ? 'selected' : ''}>1st Year</option>
+										<option value="2" ${cellContent === '2' ? 'selected' : ''}>2nd Year</option>
+										<option value="3" ${cellContent === '3' ? 'selected' : ''}>3rd Year</option>
+										<option value="4" ${cellContent === '4' ? 'selected' : ''}>4th Year</option>
+								</select>
+						`);
+					} else {
+						$('#cellContent').replaceWith('<select id="cellContent" class="form-control"></select>');
+
+						$.ajax({
+							url: '../includes/populate.php',
+							type: 'POST',
+							data: {
+								column: cellColumn,
+								id: cellId
+							},
+							success: function(response) {
+								var options = JSON.parse(response);
+
+								$('#cellContent').empty();
+
+								$.each(options, function(value, text) {
+									$('#cellContent').append($('<option>', {
+										value: value,
+										text: text
+									}));
+								});
+
+								$('#cellContent').val(cellContent);
+							},
+							error: function(jqXHR, textStatus, errorThrown) {
+								console.error('Error fetching dropdown options:', textStatus, errorThrown);
+								alert('Failed to load options. Please try again.');
+							}
+						});
+					}
+				} else if (cellType === 'date_time') {
+					$('#cellContent').replaceWith('<input type="date" class="form-control" id="cellContent">');
+					$('#cellContent').val(cellContent);
+					$('#cellContent').datepicker({
+						dateFormat: 'yy-mm-dd' // Adjust format as needed
+					});
+				} else {
+					$('#cellContent').replaceWith('<input type="text" class="form-control" id="cellContent">');
+					$('#cellContent').val(cellContent);
+				}
+
+				// Show the modal
+				$('#editModal').modal('show');
+			}
+		});
+
+		// Handle save button click
+		$('#save_gy_sn').click(function() {
+			var updatedContent = $('#cellContent').val();
+			var cellId = $('#cellId').val();
+			var cellColumn = $('#cellColumn').val();
+			$.ajax({
+				url: '../query.php', // PHP file to process the update
+				type: 'POST',
+				data: {
+					id: cellId,
+					content: updatedContent,
+					column: cellColumn,
+					'save_gy_sn': true
+				},
+				success: function(response) {
+					var res = JSON.parse(response);
+					if (res.status === 'success') {
+						$('td[data-id="' + cellId + '"][data-column="' + cellColumn + '"]').text(updatedContent);
+						$('#editModal').modal('hide');
+						toastr.success('Data successfully updated');
+					} else {
+						alert(res.message); // Show error message from the server
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error('Error updating cell:', textStatus, errorThrown);
+					alert('Failed to update the cell. Please try again.');
+				}
+			});
+		});
+	});
+</script> -->
+
+<script>
+	$(document).ready(function() {
+		// Event handler for table cell clicks
+		$('td').click(function() {
+			if ($(this).hasClass('editable')) {
+				let cell = $(this);
+				let cellContent = cell.text().trim();
+				let cellId = cell.data('id');
+				let cellColumn = cell.data('column');
+				let cellTitle = cell.data('title').toUpperCase();
+				let cellType = cell.data('type');
+				let cellIndex = cell.index();
+
+				// If cell is both editable and conditional, show error
+				if (cell.hasClass('conditional') && !cell.hasClass('table-success')) {
+					toastr.error("Can't update this data!");
+					return;
+				}
+
+				// Set hidden fields and modal title
+				$('#cellId').val(cellId);
+				$('#cellColumn').val(cellColumn);
+				$('#editModalLabel').text(cellTitle);
+
+				// Configure input based on cellType and cellIndex
+				let inputField = '<input type="text" class="form-control" id="cellContent">';
+				if (cellType === 'dropdown') {
+					let optionsHTML = getOptionsHTML(cellIndex, cellContent);
+					if (optionsHTML) {
+						inputField = `<select id="cellContent" class="form-control">${optionsHTML}</select>`;
+					} else {
+						// Load options via AJAX for non-hardcoded dropdowns
+						inputField = '<select id="cellContent" class="form-control"></select>';
+						populateDropdown(cellColumn, cellId, cellContent);
+					}
+				} else if (cellType === 'date_time') {
+					inputField = '<input type="date" class="form-control" id="cellContent">';
+				}
+
+				// Replace #cellContent with the appropriate input field and set value
+				$('#cellContent').replaceWith(inputField);
+				if (cellType !== 'dropdown') $('#cellContent').val(cellContent);
+				$('#editModal').modal('show');
+			}
+		});
+
+		// Save button handler
+		$('#save_gy_sn').click(function() {
+			$.ajax({
+				url: '../query.php',
+				type: 'POST',
+				data: {
+					id: $('#cellId').val(),
+					content: $('#cellContent').val(),
+					column: $('#cellColumn').val(),
+					'save_gy_sn': true
+				},
+				success: function(response) {
+					let res = JSON.parse(response);
+					if (res.status === 'success') {
+						$('td[data-id="' + $('#cellId').val() + '"][data-column="' + $('#cellColumn').val() + '"]').text($('#cellContent').val());
+						$('#editModal').modal('hide');
+						toastr.success('Data successfully updated');
+					} else {
+						alert(res.message);
+					}
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error('Error updating cell:', textStatus, errorThrown);
+					alert('Failed to update the cell. Please try again.');
+				}
+			});
+		});
+
+		// Populate dropdown based on AJAX response
+		function populateDropdown(column, id, selectedValue) {
+			$.ajax({
+				url: '../includes/populate.php',
+				type: 'POST',
+				data: {
+					column,
+					id
+				},
+				success: function(response) {
+					let options = JSON.parse(response);
+					$('#cellContent').empty();
+					$.each(options, function(value, text) {
+						$('#cellContent').append(`<option value="${value}" ${value === selectedValue ? 'selected' : ''}>${text}</option>`);
+					});
+				},
+				error: function(jqXHR, textStatus, errorThrown) {
+					console.error('Error fetching dropdown options:', textStatus, errorThrown);
+					alert('Failed to load options. Please try again.');
+				}
+			});
+		}
+
+		function getOptionsHTML(index, selected) {
+			const optionsMap = {
+				2: {
+					CWTS: 'CWTS',
+					LTS: 'LTS',
+					ROTC: 'ROTC'
+				},
+				10: {
+					Male: 'Male',
+					Female: 'Female'
+				},
+				15: {
+					SUCs: 'SUCs',
+					LUCs: 'LUCs',
+					OGs: 'OGs',
+					'Private HEI': 'Private HEI'
+				},
+				17: {
+					'1': '1st Year',
+					'2': '2nd Year',
+					'3': '3rd Year',
+					'4': '4th Year'
+				}
+			};
+			if (optionsMap[index]) {
+				return Object.entries(optionsMap[index])
+					.map(([value, text]) => `<option value="${value}" ${value === selected ? 'selected' : ''}>${text}</option>`)
+					.join('');
+			}
+			return '';
+		}
+	});
+</script>
 
 <?php
 unset($_SESSION['response']);

@@ -10,42 +10,22 @@ require "../includes/functions.php";
 require "../connection/dsn.php";
 
 if (isset($_POST['generate-report'])) {
-	// $fileName = $_POST['file-name'];
-	// $reportTitle = $_POST['report-title'];
-	$college = $_POST['college'];
-	$yearLevel = $_POST['year-level'];
-	$ntspComponent = $_POST['nstp-component'];
+	$search = isset($_POST['search']) ? $_POST['search'] : '';
+	$sex = isset($_POST['sex']) ? $_POST['sex'] : '';
+	$college = isset($_POST['college']) ? $_POST['college'] : '';
+	$yearLevel = isset($_POST['year_level']) ? $_POST['year_level'] : '';
+	$ntspComponent = isset($_POST['nstp-component']) ? $_POST['nstp-component'] :  '';
 
 	// Get database connection
 	$pdo = getDatabaseConnection();
 
-	$tableName = "cwts";
-
-	// Retrieve data based on the form input
-	if (isset($ntspComponent)) {
-
-		switch ($ntspComponent) {
-			case "cwts":
-				$tableName = "cwts";
-				break;
-			case "lts":
-				$tableName = "lts";
-				break;
-			case "rotc":
-				$tableName = "rotc";
-				break;
-			default:
-				break;
-		}
-	};
-
-	$data = getData($pdo, $tableName, $yearLevel, $college, $ntspComponent);
+	$data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search);
 
 	// Define headers
 	$headers = [
 		'SEQNO.' => 'std_id',
 		'NSTP GRADUATION YEAR' => 'nstp_grad_year',
-		'NSTP COMPONENT (CWTS/LTS/ROTC)' => 'ntsp_component',
+		'NSTP COMPONENT (CWTS/LTS/ROTC)' => 'nstp_component',
 		'REGION' => 'region',
 		'NSTP SERIAL NUMBER' => 'serial_number',
 		'LAST NAME' => 'l_name',

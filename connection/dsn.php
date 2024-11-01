@@ -1,6 +1,7 @@
 <?php
-function getDatabaseConnection() {
-    $dsn = "mysql:host=localhost;dbname=clms_db;port=3307;";
+function getDatabaseConnection()
+{
+    $dsn = "mysql:host=localhost;dbname=clms_db;port=3306;";
     $username = "root";
     $pass = "";
 
@@ -13,5 +14,3 @@ function getDatabaseConnection() {
         die("Connection failed. Please try again later."); // Stop script execution with a generic message
     }
 }
-
-

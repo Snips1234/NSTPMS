@@ -9,41 +9,21 @@ $pdo = getDatabaseConnection();
 // update data
 if (isset($_POST['admin-update'])) {
   $data = $_POST;
-  //var_dump($data);
+  // echo "<pre>";
+  // var_dump($data);
+  // echo "</pre>";
   $errors = validate($data, $edit_rules, $pdo);
 
   if (count($errors) === 0) {
 
-    if (empty($data['password'])) {
-      try {
-        $stmt = $pdo->prepare("SELECT pass FROM tbl_20_columns WHERE std_id = :std_id");
-        $stmt->bindValue(':std_id', $data['std_id'], PDO::PARAM_INT);
-        $stmt->execute();
-        $currentPassword = $stmt->fetchColumn();
-      } catch (PDOException $e) {
-        $_SESSION['response']['update'] = "failed";
-        header('Location: Admin/edit_lts.php?std_id=' . $data['std_id']);
-        exit();
-      }
-    }
-
-
-    $query = "UPDATE tbl_20_columns_cwts
+    $query = "UPDATE tbl_20_columns
                   SET l_name = :last_name, f_name = :first_name, ex_name = :name_extension, 
                       m_name = :middle_name, HEI_name = :HEI_name, type_of_HEI = :type_of_HEI, b_date = :birthday, sex = :gender, 
                       st_brgy = :address_street_barangay, municipality = :address_municipality, 
                       province = :address_province, region = :region, c_status = :civil_status, religion = :religion, 
                       email_add = :email, cp_number = :contact_number, college = :college, 
                       y_level = :year_level, course = :course, major = :major, 
-                      cpce = :contact_person_name, cpce_cp_number = :contact_person_number";
-
-
-    if (!empty($data['password'])) {
-      $query .= ", pass = :pass";
-    }
-
-    $query .= " WHERE std_id = :std_id";
-
+                      cpce = :contact_person_name, cpce_cp_number = :contact_person_number ,nstp_component = :nstp_component WHERE std_id = :std_id";
 
     $params = [
       ':last_name' => ucwords($data['last-name']),
@@ -68,13 +48,14 @@ if (isset($_POST['admin-update'])) {
       ':major' => ucwords($data['major']),
       ':contact_person_name' => ucwords($data['contact-person-name']),
       ':contact_person_number' => $data['contact-person-number'],
+      ':nstp_component' => $data['nstp-component'],
       ':std_id' => $data['std_id']
     ];
 
 
-    if (!empty($data['password'])) {
-      $params[':pass'] = password_hash($data['password'], PASSWORD_ARGON2I);
-    }
+    // if (!empty($data['password'])) {
+    //   $params[':pass'] = password_hash($data['password'], PASSWORD_ARGON2I);
+    // }
 
     try {
       $stmt = $pdo->prepare($query);
@@ -88,17 +69,17 @@ if (isset($_POST['admin-update'])) {
 
       if ($success) {
         $_SESSION['response']['update'] = "success";
-        header('Location: Admin/cwts.php');
+        header('Location: Admin/enrollment.php');
         exit();
       } else {
         $_SESSION['response']['update'] = "failed";
-        header('Location: Admin/edit_cwts.php');
+        header('Location: Admin/update_data.php');
         exit();
       }
     } catch (PDOException $e) {
       error_log("ROTC UPDATE: " . $e->getMessage());
       $_SESSION['response']['update'] = "failed";
-      header('Location: Admin/edit_cwts.php');
+      header('Location: Admin/update_data.php');
       exit();
     } finally {
       $stmt = null;
@@ -107,7 +88,7 @@ if (isset($_POST['admin-update'])) {
     $_SESSION['errors'] = $errors;
     $_SESSION['old-data'] = $data;
     $_SESSION['response']['update'] = "failed";
-    header('Location: Admin/edit_cwts.php?std_id=' . $data['std_id']);
+    header('Location: Admin/update_data.php?std_id=' . $data['std_id']);
     exit();
   }
 }
@@ -145,7 +126,7 @@ if (isset($_POST['admin-register'])) {
 
   if (!count($errors) > 0) {
     $query = "INSERT INTO tbl_20_columns (l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province, region, c_status, religion, email_add, cp_number, college, y_level, course, major, cpce, cpce_cp_number, nstp_component) 
-              VALUES (:last_name, :first_name, :name_extension, :middle_name, :HEI_name, :type_of_HEI, :birthday, :gender, :address_street_barangay, :address_municipality, :address_province, :region, :civil_status, :religion, :email, :contact_number, :college, :year_level, :course, :major, :contact_person_name, :contact_person_number, :student_type)";
+              VALUES (:last_name, :first_name, :name_extension, :middle_name, :HEI_name, :type_of_HEI, :birthday, :gender, :address_street_barangay, :address_municipality, :address_province, :region, :civil_status, :religion, :email, :contact_number, :college, :year_level, :course, :major, :contact_person_name, :contact_person_number, :nstp_component)";
 
     $params = array(
       ':last_name' => ucwords($data['last-name']),
@@ -170,7 +151,7 @@ if (isset($_POST['admin-register'])) {
       ':major' => ucwords($data['major']),
       ':contact_person_name' => ucwords($data['contact-person-name']),
       ':contact_person_number' => $data['contact-person-number'],
-      ':student_type' => $data['student-type'],
+      ':nstp_component' => $data['nstp-component'],
     );
 
     try {
@@ -223,10 +204,10 @@ if (isset($_POST['login'])) {
 
   if ($user) {
     if (password_verify($password, $user['pass'])) {
-        $_SESSION['std_id'] = $user['std_id'];
-        $_SESSION['username'] = $user['username'];
-        header('Location: Admin/dashboard.php');
-        exit();
+      $_SESSION['std_id'] = $user['std_id'];
+      $_SESSION['username'] = $user['username'];
+      header('Location: Admin/dashboard.php');
+      exit();
     } else {
       $_SESSION['response']['login'] = 'failed';
       header('Location: login-page.php');
@@ -239,7 +220,53 @@ if (isset($_POST['login'])) {
   }
 }
 
-// udpate grades cwts
+// update Graduation year and Serial number
+// if (isset($_POST['save_gy_sn'])) {
+//   if (isset($_POST['id']) && isset($_POST['content'])  && isset($_POST['column'])) {
+//     $id = $_POST['id'];
+//     $content = $_POST['content'];
+//     $column = $_POST['column'];
+
+//     $query = "UPDATE tbl_20_columns SET $column = :content WHERE std_id = :id";
+
+//     $stmt = $pdo->prepare($query);
+//     $stmt->bindValue($column, $content);
+//     $stmt->bindValue(':id', $id);
+
+
+//     $stmt->execute();
+//   }
+// }
+
+if (isset($_POST['save_gy_sn'])) {
+  // Check that necessary POST data is set
+  if (isset($_POST['id']) && isset($_POST['content']) && isset($_POST['column'])) {
+    $id = $_POST['id'];
+    $content = $_POST['content'];
+    $column = $_POST['column'];
+
+    // Prepare the update query
+    $query = "UPDATE tbl_20_columns SET $column = :content WHERE std_id = :id";
+
+    $stmt = $pdo->prepare($query);
+
+    // Bind parameters
+    $stmt->bindValue(':content', $content);
+    $stmt->bindValue(':id', $id);
+
+    try {
+      $stmt->execute();
+      echo json_encode(['status' => 'success', 'message' => 'Update successful']);
+    } catch (PDOException $e) {
+      // Handle error
+      echo json_encode(['status' => 'error', 'message' => 'Database error: ' . $e->getMessage()]);
+    }
+  } else {
+    echo json_encode(['status' => 'error', 'message' => 'Missing data']);
+  }
+}
+
+// udpate grades 
 if (isset($_POST['update-grades'])) {
   try {
     $pdo->beginTransaction();
@@ -264,7 +291,6 @@ if (isset($_POST['update-grades'])) {
 
         // 1st semester quarter  1 
 
-
         if ($quarter_1_grade_sem_1 === 'INC' || strpos($quarter_1_grade_sem_1, '4') !== false) {
           $quarter_1_grade_sem_1 =  "INC";
           $remarks_sem_1 = 'Failed';
@@ -277,6 +303,7 @@ if (isset($_POST['update-grades'])) {
             $quarter_1_grade_sem_1 = number_format($quarter_1_grade_sem_1, 2, ".", '');
           }
         }
+
         // 1st semester quarter  2 
 
         if ($quarter_2_grade_sem_1 === 'INC' || strpos($quarter_2_grade_sem_1, '4') !== false) {
@@ -342,7 +369,7 @@ if (isset($_POST['update-grades'])) {
         echo "average 2: " . $average_semester_2 . "<br>";
 
         // Prepare the SQL query to update the database
-        $query = "UPDATE tbl_20_columns_cwts 
+        $query = "UPDATE tbl_20_columns
                               SET quarter_1_grade_sem_1 = :quarter_1_grade_sem_1, 
                                   quarter_2_grade_sem_1 = :quarter_2_grade_sem_1, 
                                   average_sem_1 = :average_sem_1, 
@@ -375,20 +402,22 @@ if (isset($_POST['update-grades'])) {
 
       $pdo->commit();
       $_SESSION['response']['grades'] = 'success';
-      header('Location: Admin/cwts_grading.php');
+      header('Location: Admin/grading.php');
       exit();
     } else {
       $_SESSION['response']['grades'] = 'failed';
-      header('Location: Admin/cwts_grading.php');
+      header('Location: Admin/grading.php');
       exit();
     }
   } catch (PDOException $e) {
+    error_log("GRADE: " . $e->getMessage());
     $pdo->rollBack();
     $_SESSION['response']['grades'] = 'failed';
-    header('Location: Admin/cwts_grading.php');
+    header('Location: Admin/grading.php');
     exit();
   }
 }
+
 function roundToNearestGrade($average)
 {
 

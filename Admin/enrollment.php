@@ -29,7 +29,7 @@ try {
     $query .= " WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
   }
 
-  $query .= " ORDER BY std_id DESC LIMIT :limit OFFSET :offset";
+  $query .= " ORDER BY l_name ASC LIMIT :limit OFFSET :offset";
 
   $stmt = $pdo->prepare($query);
 
@@ -86,7 +86,7 @@ try {
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h3 class="m-0">NSTP STUDENTS</h3>
+          <h3 class="m-0">ENROLLMENT</h3>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -161,9 +161,9 @@ try {
                               <a href="update_data.php?std_id=<?= htmlspecialchars($row['std_id']) ?>" class="btn btn-tool">
                                 <i class="fas fa-pen text-success"></i>
                               </a>
-                              <a href="javascript:void(0)" class="btn btn-tool open-delete-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-target="#delete_modal" data-type="delete">
+                              <!-- <a href="javascript:void(0)" class="btn btn-tool open-delete-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-target="#delete_modal" data-type="delete">
                                 <i class="fas fa-trash text-danger"></i>
-                              </a>
+                              </a> -->
                             </td>
                           </tr>
                         <?php endforeach; ?>

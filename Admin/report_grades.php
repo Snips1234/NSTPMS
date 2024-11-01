@@ -16,8 +16,7 @@ require "Partials/sidebar.php";
 				<div class="col-sm-6">
 					<ol class="breadcrumb float-sm-right">
 						<li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-						<li class="breadcrumb-item"><a href="nstp_data_field.php">NSTP Data Field</a></li>
-						<li class="breadcrumb-item">NSTP Data Field Report</li>
+						<li class="breadcrumb-item">Grade report</li>
 					</ol>
 				</div><!-- /.col -->
 			</div><!-- /.row -->
@@ -31,10 +30,10 @@ require "Partials/sidebar.php";
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<form id="" action="report_20_columns.php" method="post">
+						<form id="" action="generate_grade_report.php" method="post">
 							<div class="card">
 								<div class="card-header bg-warning">
-									<h4 class="text-white">NSTP DATA FIELD REPORT</h4>
+									<h4 class="text-white">Grades report</h4>
 								</div>
 								<div class="card-body">
 									<fieldset>
