@@ -4,8 +4,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Dashboard</title>
-  <!-- <link rel="icon" type="image/x-icon" href="../Images/school_logo_icon.ico"> -->
+  <title>NSTP RMS</title>
+  <link rel="icon" type="image/x-icon" href="../Images/school_logo_icon.ico">
   <link rel="stylesheet" href="../plugins/fontawesome-free/css/all.min.css">
   <link rel="stylesheet" href="../plugins/tempusdominus-bootstrap-4/css/tempusdominus-bootstrap-4.min.css">
   <link rel="stylesheet" href="../dist/css/adminlte.min.css">

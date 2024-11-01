@@ -8,6 +8,7 @@ session_start();
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/x-icon" href="Images/school_logo_icon.ico">
   <link rel="stylesheet" href="css/bootstrap.min.css">
   <link rel="stylesheet" href="icons/css/all.css">
   <link rel="stylesheet" href="css/styles.css">
@@ -54,7 +55,7 @@ session_start();
       display: none;
     }
   </style>
-  <title>CWTS and LTS MANAGEMENT SYSTEM</title>
+  <title>NSTP RMS</title>
 </head>
 
 <body class="wrapper">
