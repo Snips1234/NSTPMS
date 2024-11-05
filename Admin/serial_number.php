@@ -119,7 +119,18 @@ try {
 } catch (PDOException $e) {
   echo 'Connection failed: ' . $e->getMessage();
 }
+try {
+  require_once('../connection/dsn.php');
+  $pdo = getDatabaseConnection();
 
+  $query = "SELECT * FROM `tbl_colleges` WHERE college_id != 6";
+  $stmt = $pdo->prepare($query);
+  $stmt->execute();
+
+  $colleges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  echo 'Connection failed: ' . $e->getMessage();
+}
 ?>
 
 <script>
@@ -202,16 +213,17 @@ try {
                       </div>
 
                       <div class="col-md-3 mt-1">
-                        <label for="college" class="form-label text-secondary">College</label>
-                        <select name="college" id="college" class="form-control">
-                          <option value="">All</option>
-                          <option value="agriculture" <?= isset($_GET['college']) && $_GET['college'] ==  'agriculture' ? 'selected' : ''; ?>>AGRICULTURE</option>
-                          <option value="arts & science" <?= isset($_GET['college']) && $_GET['college'] ==  'arts & science' ? 'selected' : ''; ?>>ARTS & SCIENCE</option>
-                          <option value="education" <?= isset($_GET['college']) && $_GET['college'] ==  'education' ? 'selected' : ''; ?>>EDUCATION</option>
-                          <option value="engineering" <?= isset($_GET['college']) && $_GET['college'] ==  'engineering' ? 'selected' : ''; ?>>ENGINEERING</option>
-                          <option value="industrial technology" <?= isset($_GET['college']) && $_GET['college'] ==  'industrial technology' ? 'selected' : ''; ?>>INDUSTRIAL TECHNOLOGY</option>
-                          <!-- Add more course options as needed -->
-                        </select>
+                        <div class="control">
+                          <label for="college" class="form-label text-secondary">College</label>
+                          <select class="form-control" name="college" id="college">
+                            <option value="" selected>All</option>
+                            <?php foreach ($colleges as $college): ?>
+                              <option value="<?= htmlspecialchars($college['colleges']) ?>" <?= (isset($_GET['college']) && ($_GET['college'] == $college['colleges']) ? 'selected' : ''); ?>>
+                                <?= htmlspecialchars($college['colleges']) ?>
+                              </option>
+                            <?php endforeach; ?>
+                          </select>
+                        </div>
                       </div>
                       <div class="col-md-3 mt-1 align-self-end">
                         <button class="btn btn-primary w-100" type="submit">Filter</button>
@@ -283,14 +295,28 @@ try {
                       <ul class="pagination float-right">
                         <!-- Previous Button -->
                         <li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
-                          <a href="?search=<?php echo htmlspecialchars($search); ?>&year_level=<?php echo htmlspecialchars($year_level); ?>&college=<?php echo htmlspecialchars($college); ?>&sex=<?php echo htmlspecialchars($sex); ?>&year=<?php echo htmlspecialchars($year); ?>&nstp_component=<?php echo htmlspecialchars($component); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+                          <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
                         </li>
+
+                        <?php
+                        // Determine the range of pages to show
+                        $pageCount = 5; // Total pages to show
+                        $startPage = max(1, $page - floor($pageCount / 2)); // Start page
+                        $endPage = min($totalPages, $startPage + $pageCount - 1); // End page
+
+                        // Adjust startPage if we are near the end
+                        if ($endPage - $startPage < $pageCount - 1) {
+                          $startPage = max(1, $endPage - $pageCount + 1);
+                        }
+                        ?>
+
                         <!-- Page Numbers -->
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                           <li class="paginate_button pagination-sm page-item <?php echo ($i === $page) ? 'active' : ''; ?>">
                             <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
                           </li>
                         <?php endfor; ?>
+
                         <!-- Next Button -->
                         <li class="paginate_button pagination-sm page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
                           <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo min($page + 1, $totalPages); ?>" class="page-link">Next</a>

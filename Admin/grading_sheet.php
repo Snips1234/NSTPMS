@@ -18,7 +18,7 @@ try {
 	require_once('../connection/dsn.php');
 	$pdo = getDatabaseConnection();
 
-	$query = "SELECT std_id, CONCAT_WS(' ', l_name, f_name, ex_name, m_name) as full_name, b_date, sex, st_brgy, municipality, province, c_status, religion, email_add, cp_number, college, y_level, course, major, quarter_1_grade_sem_1, quarter_1_percent_sem_1, quarter_2_grade_sem_1, quarter_2_percent_sem_1, average_sem_1, average_percent_sem_1, remarks_sem_1, school_year_sem_1, quarter_1_grade_sem_2, quarter_1_percent_sem_2, quarter_2_grade_sem_2, quarter_2_percent_sem_2, average_sem_2, average_percent_sem_2, remarks_sem_2, school_year_sem_2, serial_number, cpce, cpce_cp_number, nstp_component, created_at FROM tbl_20_columns WHERE 1=1";
+	$query = "SELECT std_id, CONCAT_WS(' ', l_name, f_name, ex_name, m_name) as full_name, b_date, sex, st_brgy, municipality, province, c_status, religion, email_add, cp_number, college, y_level, course, major, quarter_1_grade_sem_1, quarter_1_percent_sem_1, quarter_2_grade_sem_1, quarter_2_percent_sem_1, average_sem_1, average_percent_sem_1, remarks_sem_1, school_year_sem_1, quarter_1_grade_sem_2, quarter_1_percent_sem_2, quarter_2_grade_sem_2, quarter_2_percent_sem_2, average_sem_2, average_percent_sem_2, remarks_sem_2, school_year_sem_2, serial_number, cpce, cpce_cp_number, nstp_component, created_at FROM tbl_20_columns WHERE 1=1 AND term != ''";
 
 	if ($search) {
 		$query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
@@ -63,7 +63,7 @@ try {
 	$stmt->execute();
 	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1";
+	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1 AND term != ''";
 
 	if ($search) {
 		$countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
