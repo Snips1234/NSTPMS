@@ -1,5 +1,6 @@
 <?php
 session_start();
+ob_start();
 require "Partials/header.php";
 require "Partials/navbar.php";
 require "Partials/sidebar.php";
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if CSV has exactly 20 columns
         if (count($headerRow) === $expectedColumnCount) {
           // Prepare your SQL insert statement
-          $stmt = $conn->prepare("INSERT INTO tbl_temp (seq_no, graduation_year, component, region, serial_no, last_name, first_name, extension_name, middle_name, birthday, sex, street_barangay, town_city, province, hei_name, types_of_heis, program_course, year_level, email_address, contact_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+          $stmt = $conn->prepare("INSERT INTO tbl_20_columns (nstp_grad_year, nstp_component, region, serial_number, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province, HEI_name, type_of_HEI, course, y_level, email_add, cp_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
           // Read and save each row to the database
           while (($data = fgetcsv($handle, 1000, ',')) !== false) {
@@ -37,32 +38,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               }
 
               // Execute the prepared statement with the current row of data
-              $stmt->execute($data);
+              $stmt->execute(array_slice($data, 1));
             }
           }
 
           // Close the file handle
           fclose($handle);
-          echo "<script>toastr.success('Data successfully added!');</script>";
+
+          // Set a success message in session (optional)
+          $_SESSION['message'] = 'Data successfully added!';
+
+          // Redirect to the same page to prevent resubmission
+          header('Location: ' . $_SERVER['PHP_SELF']);
+          exit();
         } else {
-          echo "<script>toastr.error('Error: CSV must have exactly 20 columns.');</script>";
+          $_SESSION['error'] = 'Error: CSV must have exactly 20 columns.';
         }
       } else {
-
-        echo "<script>toastr.error('Error: Unable to open the file.');</script>";
+        $_SESSION['error'] = 'Error: Unable to open the file.';
       }
     } else {
-
-      echo "<script>toastr.error('Error: Only CSV files are allowed.');</script>";
+      $_SESSION['error'] = 'Error: Only CSV files are allowed.';
     }
   } else {
-    echo "<script>toastr.error('Error: No file uploaded or there was an upload error.');</script>";
+    $_SESSION['error'] = 'Error: No file uploaded or there was an upload error.';
   }
 }
 
+// Display messages (if any) after the redirect
+if (isset($_SESSION['message'])) {
+  echo "<script>toastr.success('" . $_SESSION['message'] . "');</script>";
+  unset($_SESSION['message']); // Clear the message after displaying
+}
+
+if (isset($_SESSION['error'])) {
+  echo "<script>toastr.error('" . $_SESSION['error'] . "');</script>";
+  unset($_SESSION['error']); // Clear the error after displaying
+}
 // Close the database connection
-$conn = null; // PDO: Setting the connection to null closes it
+$conn = null;
+// PDO: Setting the connection to null closes it
+ob_end_flush();
 ?>
+
 
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->

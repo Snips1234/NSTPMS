@@ -29,6 +29,12 @@
           </a>
           <ul class="nav nav-treeview">
             <li class="nav-item">
+              <a href="./nstp_not_enrolled_registration.php" class="nav-link">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                <p>Not Enrolled</p>
+              </a>
+            </li>
+            <li class="nav-item">
               <a href="./nstp_1_registration.php" class="nav-link">
                 <i class="fa fa-users" aria-hidden="true"></i>
                 <p>NSTP 1</p>
@@ -88,7 +94,7 @@
             </li>
             <li class="nav-item">
               <a href="../Admin/csv_upload.php" class="nav-link">
-                <i class="fa fa-asterisk" aria-hidden="true"></i>
+                <i class="fa fa fa-print" aria-hidden="true"></i>
                 <p>CSV Upload</p>
               </a>
             </li>

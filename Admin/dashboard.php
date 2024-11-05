@@ -1,7 +1,7 @@
 <?php
 session_start();
 if (!isset($_SESSION['username']) && !isset($_SESSION['std_id'])) {
-  header('Location: login-page.php');
+  header('Location: ../login-page.php');
   exit();
 }
 

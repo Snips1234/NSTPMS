@@ -194,12 +194,26 @@ try {
                         <li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
                           <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
                         </li>
+
+                        <?php
+                        // Determine the range of pages to show
+                        $pageCount = 5; // Total pages to show
+                        $startPage = max(1, $page - floor($pageCount / 2)); // Start page
+                        $endPage = min($totalPages, $startPage + $pageCount - 1); // End page
+
+                        // Adjust startPage if we are near the end
+                        if ($endPage - $startPage < $pageCount - 1) {
+                          $startPage = max(1, $endPage - $pageCount + 1);
+                        }
+                        ?>
+
                         <!-- Page Numbers -->
-                        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <?php for ($i = $startPage; $i <= $endPage; $i++): ?>
                           <li class="paginate_button pagination-sm page-item <?php echo ($i === $page) ? 'active' : ''; ?>">
                             <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
                           </li>
                         <?php endfor; ?>
+
                         <!-- Next Button -->
                         <li class="paginate_button pagination-sm page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
                           <a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo min($page + 1, $totalPages); ?>" class="page-link">Next</a>

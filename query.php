@@ -167,7 +167,7 @@ if (isset($_POST['admin-register'])) {
 
       if ($success) {
         $_SESSION['response'] = "success";
-        header('Location: Admin/enrollment.php');
+        header('Location: Admin/nstp_1_registration.php');
         exit();
       } else {
         $_SESSION['response'] = "failed";

@@ -290,9 +290,8 @@ try {
 										</table>
 									</div>
 									<div class="card-footer">
-
-										<div class="row  d-flex justify-content-between">
-
+										<div class="row d-flex justify-content-between">
+											<!-- Entry Information -->
 											<div class="col-sm-12 col-md-4">
 												<div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
 													<?php if ($totalEntries > 0): ?>
@@ -301,35 +300,51 @@ try {
 														No entries found
 													<?php endif; ?>
 												</div>
-												<div class="col-sm-12 col-md-4">
-													<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
-														<ul class="pagination ">
-															<!-- Previous Button -->
-															<li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+											</div>
 
-																<a href="?search=<?php echo htmlspecialchars($search); ?>&year_level=<?php echo htmlspecialchars($year_level); ?>&college=<?php echo htmlspecialchars($college); ?>&sex=<?php echo htmlspecialchars($sex); ?>&year=<?php echo htmlspecialchars($year); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+											<!-- Pagination -->
+											<!-- Pagination -->
+											<div class="col-sm-12 col-md-4">
+												<div class="dataTables_paginate paging_simple_numbers" id="example2_paginate">
+													<ul class="pagination">
+														<!-- Previous Button -->
+														<li class="paginate_button pagination-sm page-item <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+															<a href="?search=<?php echo htmlspecialchars($search); ?>&year_level=<?php echo htmlspecialchars($year_level); ?>&college=<?php echo $college; ?>&sex=<?php echo htmlspecialchars($sex); ?>&year=<?php echo htmlspecialchars($year); ?>&page=<?php echo max($page - 1, 1); ?>" class="page-link">Previous</a>
+														</li>
+														<!-- Page Numbers -->
+														<?php
+														// Calculate the start and end page numbers for the pagination
+														$startPage = max(1, $page - 2);
+														$endPage = min($totalPages, $startPage + 4);
 
+														// Adjust start page if there are less than 5 pages total
+														if ($endPage - $startPage < 4) {
+															$startPage = max(1, $endPage - 4);
+														}
+
+														// Display page numbers
+														for ($i = $startPage; $i <= $endPage; $i++): ?>
+															<li class="paginate_button pagination-sm page-item <?php echo ($i === $page) ? 'active' : ''; ?>">
+																<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
 															</li>
-															<!-- Page Numbers -->
-															<?php for ($i = 1; $i <= $totalPages; $i++): ?>
-																<li class="paginate_button pagination-sm page-item <?php echo ($i === $page) ? 'active' : ''; ?>">
-																	<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
-																</li>
-															<?php endfor; ?>
-															<!-- Next Button -->
-															<li class="paginate_button pagination-sm page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
-																<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo min($page + 1, $totalPages); ?>" class="page-link">Next</a>
-															</li>
-														</ul>
-													</div>
-												</div>
-												<div class="col-sm-12 col-md-4 ">
-													<button type="submit" name="update-grades" class="btn btn-sm btn-primary float-right" value="Submit">
-														Update grades
-													</button>
+														<?php endfor; ?>
+														<!-- Next Button -->
+														<li class="paginate_button pagination-sm page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
+															<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo min($page + 1, $totalPages); ?>" class="page-link">Next</a>
+														</li>
+													</ul>
 												</div>
 											</div>
+
+
+											<!-- Update Grades Button -->
+											<div class="col-sm-12 col-md-4 ">
+												<button type="submit" name="update-grades" class="btn btn-sm btn-primary float-right" value="Submit">
+													Update grades
+												</button>
+											</div>
 										</div>
+									</div>
 								</form>
 							</div>
 						</div>

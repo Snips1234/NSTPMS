@@ -22,7 +22,7 @@ try {
   $query = "SELECT std_id, (if (ex_name = 'N/A', CONCAT_WS(' ', l_name, f_name,  m_name) , CONCAT_WS(' ', l_name, f_name, ex_name, m_name))) as full_name, b_date, sex, st_brgy, municipality, province, 
               c_status, religion, email_add, cp_number, college, y_level, course, major, 
               cpce, cpce_cp_number, nstp_component, created_at
-              FROM tbl_20_columns WHERE 1=1 AND term = 2 ";
+              FROM tbl_20_columns WHERE 1=1 AND term = '' ";
 
   // Add search condition if provided
   if ($search) {
@@ -44,7 +44,7 @@ try {
   $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   // Get total number of entries for pagination
-  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE term = 2";
+  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE term = ''";
   if ($search) {
     $countQuery .= "  AND CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
   }
@@ -112,9 +112,9 @@ try {
                     <i class="fas fa-minus"></i>
                   </button>
                 </div>
-                <h3 class="card-title">NSTP 2 Student List</h3>
+                <h3 class="card-title">NSTP 1 Student List</h3>
                 <div class="mt-5 d-flex justify-content-between align-items-center">
-                  <a href="register.php?term=2" class="btn btn-primary" style="width: 160px !important;">
+                  <a href="register.php?term=1" class="btn btn-primary" style="width: 160px !important;">
                     Register
                   </a>
                   <form method="get" action="" class="">
@@ -223,6 +223,7 @@ try {
                   </div>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
