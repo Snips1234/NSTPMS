@@ -30,7 +30,7 @@ session_start();
   </div>
   <div class="container text-center">
     <h1 class="w_900 text-white display-1 ">
-      NSTP <br> <span class="display-4 w_900">Management System</span>
+      NSTP <br> <span class="display-4 w_900"> Records Management System</span>
     </h1>
     <div class="container mt-5">
       <div class="row">
