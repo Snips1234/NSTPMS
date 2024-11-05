@@ -10,6 +10,7 @@ require "../includes/functions.php";
 require "../connection/dsn.php";
 
 if (isset($_POST['generate-report'])) {
+  $term = isset($_POST['term']) ? $_POST['term'] : '';
   $search = isset($_POST['search']) ? $_POST['search'] : '';
   $sex = isset($_POST['sex']) ? $_POST['sex'] : '';
   $college = isset($_POST['college']) ? $_POST['college'] : '';
@@ -19,7 +20,7 @@ if (isset($_POST['generate-report'])) {
   // Get database connection
   $pdo = getDatabaseConnection();
 
-  $data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search);
+  $data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search, term: $term);
 
   // Define headers
   $headers = [

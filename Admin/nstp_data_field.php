@@ -111,6 +111,19 @@ try {
 } catch (PDOException $e) {
 	echo 'Connection failed: ' . $e->getMessage();
 }
+
+try {
+	require_once('../connection/dsn.php');
+	$pdo = getDatabaseConnection();
+
+	$query = "SELECT * FROM `tbl_colleges` WHERE college_id != 6";
+	$stmt = $pdo->prepare($query);
+	$stmt->execute();
+
+	$colleges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+	echo 'Connection failed: ' . $e->getMessage();
+}
 ?>
 
 
@@ -192,14 +205,13 @@ try {
 
 											<div class="col-md-3 mt-1">
 												<label for="college" class="form-label text-secondary">College</label>
-												<select name="college" id="college" class="form-control">
-													<option value="">All</option>
-													<option value="agriculture" <?= isset($_GET['college']) && $_GET['college'] ==  'agriculture' ? 'selected' : ''; ?>>AGRICULTURE</option>
-													<option value="arts & science" <?= isset($_GET['college']) && $_GET['college'] ==  'arts & science' ? 'selected' : ''; ?>>ARTS & SCIENCE</option>
-													<option value="education" <?= isset($_GET['college']) && $_GET['college'] ==  'education' ? 'selected' : ''; ?>>EDUCATION</option>
-													<option value="engineering" <?= isset($_GET['college']) && $_GET['college'] ==  'engineering' ? 'selected' : ''; ?>>ENGINEERING</option>
-													<option value="industrial technology" <?= isset($_GET['college']) && $_GET['college'] ==  'industrial technology' ? 'selected' : ''; ?>>INDUSTRIAL TECHNOLOGY</option>
-													<!-- Add more course options as needed -->
+												<select class="form-control" name="college" id="college">
+													<option value="" selected>All</option>
+													<?php foreach ($colleges as $college): ?>
+														<option value="<?= htmlspecialchars($college['colleges']) ?>" <?= (isset($_GET['college']) && ($_GET['college'] == $college['colleges']) ? 'selected' : ''); ?>>
+															<?= htmlspecialchars($college['colleges']) ?>
+														</option>
+													<?php endforeach; ?>
 												</select>
 											</div>
 											<div class="col-md-3 mt-1 align-self-end">

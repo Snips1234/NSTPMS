@@ -3,6 +3,19 @@ session_start();
 require "Partials/header.php";
 require "Partials/navbar.php";
 require "Partials/sidebar.php";
+
+try {
+  require_once('../connection/dsn.php');
+  $pdo = getDatabaseConnection();
+
+  $query = "SELECT * FROM `tbl_colleges` WHERE college_id != 6";
+  $stmt = $pdo->prepare($query);
+  $stmt->execute();
+
+  $colleges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+} catch (PDOException $e) {
+  echo 'Connection failed: ' . $e->getMessage();
+}
 ?>
 
 <div class="content-wrapper">
@@ -50,7 +63,17 @@ require "Partials/sidebar.php";
                           </select>
                         </div>
                       </div>
-                      <div class="col-md-9 mt-1">
+                      <div class="col-md-3 mt-1">
+                        <div class="control">
+                          <label for="term" class="form-label text-secondary">Term</label>
+                          <select class="custom-select" id="term" name="term">
+                            <option value="" selected>All</option>
+                            <option value="1">NSTP 1</option>
+                            <option value="2">NSTP 2</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div class="col-md-6 mt-1">
                         <div class="control">
                           <label for="search" class="form-label text-secondary">Search</label>
                           <input type="text" id="search" name="search" class="form-control" placeholder="Search..." value="<?= isset($_GET['search'])  ? $_GET['search'] : ''; ?>">
@@ -84,14 +107,13 @@ require "Partials/sidebar.php";
                       <div class="col-md-3 mt-1">
                         <div class="control">
                           <label for="college" class="form-label text-secondary">College</label>
-                          <select name="college" id="college" class="form-control">
-                            <option value="">All</option>
-                            <option value="agriculture" <?= isset($_GET['college']) && $_GET['college'] ==  'agriculture' ? 'selected' : ''; ?>>AGRICULTURE</option>
-                            <option value="arts & science" <?= isset($_GET['college']) && $_GET['college'] ==  'arts & science' ? 'selected' : ''; ?>>ARTS & SCIENCE</option>
-                            <option value="education" <?= isset($_GET['college']) && $_GET['college'] ==  'education' ? 'selected' : ''; ?>>EDUCATION</option>
-                            <option value="engineering" <?= isset($_GET['college']) && $_GET['college'] ==  'engineering' ? 'selected' : ''; ?>>ENGINEERING</option>
-                            <option value="industrial technology" <?= isset($_GET['college']) && $_GET['college'] ==  'industrial technology' ? 'selected' : ''; ?>>INDUSTRIAL TECHNOLOGY</option>
-                            <!-- Add more course options as needed -->
+                          <select class="form-control" name="college" id="college">
+                            <option value="" selected>All</option>
+                            <?php foreach ($colleges as $college): ?>
+                              <option value="<?= htmlspecialchars($college['colleges']) ?>" <?= (isset($_GET['college']) && ($_GET['college'] == $college['colleges']) ? 'selected' : ''); ?>>
+                                <?= htmlspecialchars($college['colleges']) ?>
+                              </option>
+                            <?php endforeach; ?>
                           </select>
                         </div>
                       </div>

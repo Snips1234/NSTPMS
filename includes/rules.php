@@ -95,6 +95,9 @@ $register_rules =  [
   'nstp-component' => [
     'required' => 'The nstp component field is required'
   ],
+  'term' => [
+    'required' => 'The term field is required'
+  ],
 ];
 
 
@@ -199,5 +202,8 @@ $edit_rules =  [
   ],
   'nstp-component' => [
     'required' => 'The nstp component field is required'
+  ],
+  'term' => [
+    'required' => 'The term field is required'
   ],
 ];

@@ -12,6 +12,7 @@ require "../connection/dsn.php";
 
 if (isset($_POST['generate-report'])) {
 
+	$term = isset($_POST['term']) ? $_POST['term'] : '';
 	$search = isset($_POST['search']) ? $_POST['search'] : '';
 	$sex = isset($_POST['sex']) ? $_POST['sex'] : '';
 	$college = isset($_POST['college']) ? $_POST['college'] : '';
@@ -21,7 +22,7 @@ if (isset($_POST['generate-report'])) {
 
 	$pdo = getDatabaseConnection();
 	// Retrieve data based on the form input
-	$data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search);
+	$data = getData(pdo: $pdo, yearLevel: $yearLevel, college: $college, ntspComponent: $ntspComponent, sex: $sex, search: $search, term: $term);
 	$headers = [
 		'Seq No.' => 'std_id', // Add sequence number column
 		'NSTP Serial Number' => 'serial_number', // Add serial number column
