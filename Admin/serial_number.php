@@ -165,10 +165,6 @@ try {
                 <div class="mt-5">
                   <form method="get" action="" class="">
                     <div class="row">
-                      <!-- <div class="col-md-5 mt-1">
-                        <label for="year" class="form-label text-secondary">Year</label>
-                        <input type="text" name="year" id="year" class="form-control" placeholder="Year..." value="<?php echo htmlspecialchars($year); ?>">
-                      </div> -->
                       <div class="col-md-3 mt-1">
                         <div class="control">
                           <label for="nstp_component" class="form-label text-secondary">NSTP Component</label>
@@ -184,7 +180,6 @@ try {
                         <label for="search" class="form-label text-secondary">Search</label>
                         <input type="text" name="search" id="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
                       </div>
-
                     </div>
                     <div class="row">
                       <div class="col-md-3 mt-1">

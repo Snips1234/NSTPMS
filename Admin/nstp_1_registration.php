@@ -19,14 +19,14 @@ try {
   $pdo = getDatabaseConnection();
 
   // Prepare the base query
-  $query = "SELECT std_id, CONCAT_WS(' ', l_name, f_name, ex_name, m_name) as full_name, b_date, sex, st_brgy, municipality, province,
+  $query = "SELECT std_id, (if (ex_name = 'N/A', CONCAT_WS(' ', l_name, f_name,  m_name) , CONCAT_WS(' ', l_name, f_name, ex_name, m_name))) as full_name, b_date, sex, st_brgy, municipality, province, 
               c_status, religion, email_add, cp_number, college, y_level, course, major, 
               cpce, cpce_cp_number, nstp_component, created_at
-              FROM tbl_20_columns";
+              FROM tbl_20_columns WHERE 1=1 AND term = 1 ";
 
   // Add search condition if provided
   if ($search) {
-    $query .= " WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
+    $query .= " AND CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
   }
 
   $query .= " ORDER BY l_name ASC LIMIT :limit OFFSET :offset";
@@ -44,9 +44,9 @@ try {
   $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   // Get total number of entries for pagination
-  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns";
+  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE term = 1";
   if ($search) {
-    $countQuery .= " WHERE CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
+    $countQuery .= "  AND CONCAT_WS(' ', l_name, f_name, ex_name, m_name) LIKE :search";
   }
 
   $countStmt = $pdo->prepare($countQuery);
@@ -86,12 +86,12 @@ try {
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h3 class="m-0">ENROLLMENT</h3>
+          <h3 class="m-0">REGISTRATION</h3>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="dashboard.php">Home</a></li>
-            <li class="breadcrumb-item">Enrollment</li>
+            <li class="breadcrumb-item">Registration</li>
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -112,9 +112,9 @@ try {
                     <i class="fas fa-minus"></i>
                   </button>
                 </div>
-                <h3 class="card-title">Student List</h3>
+                <h3 class="card-title">NSTP 1 Student List</h3>
                 <div class="mt-5 d-flex justify-content-between align-items-center">
-                  <a href="register.php" class="btn btn-primary" style="width: 160px !important;">
+                  <a href="register.php?term=1" class="btn btn-primary" style="width: 160px !important;">
                     Register
                   </a>
                   <form method="get" action="" class="">
@@ -167,6 +167,10 @@ try {
                             </td>
                           </tr>
                         <?php endforeach; ?>
+                      <?php else: ?>
+                        <tr>
+                          <td class="text-center " colspan="10">No entries found</td>
+                        </tr>
                       <?php endif; ?>
                     </tbody>
                   </table>
@@ -176,7 +180,11 @@ try {
                 <div class="row">
                   <div class="col-sm-12 col-md-5">
                     <div class="dataTables_info" id="example2_info" role="status" aria-live="polite">
-                      Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+                      <?php if ($totalEntries > 0): ?>
+                        Showing <?php echo $offset + 1; ?> to <?php echo min($offset + $limit, $totalEntries); ?> of <?php echo $totalEntries; ?> entries
+                      <?php else: ?>
+                        No entries found
+                      <?php endif; ?>
                     </div>
                   </div>
                   <div class="col-sm-12 col-md-7">

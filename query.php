@@ -23,12 +23,12 @@ if (isset($_POST['admin-update'])) {
                       province = :address_province, region = :region, c_status = :civil_status, religion = :religion, 
                       email_add = :email, cp_number = :contact_number, college = :college, 
                       y_level = :year_level, course = :course, major = :major, 
-                      cpce = :contact_person_name, cpce_cp_number = :contact_person_number ,nstp_component = :nstp_component WHERE std_id = :std_id";
+                      cpce = :contact_person_name, cpce_cp_number = :contact_person_number ,nstp_component = :nstp_component , term = :term WHERE std_id = :std_id";
 
     $params = [
       ':last_name' => ucwords($data['last-name']),
       ':first_name' => ucwords($data['first-name']),
-      ':name_extension' => ucwords($data['name-extension']),
+      ':name_extension' => (strcasecmp($data['name-extension'], "N/A")) ?  strToUpper($data['name-extension']) : ucwords($data['name-extension']),
       ':middle_name' => ucwords($data['middle-name']),
       ':HEI_name' => ucwords($data['hei-name']),
       ':type_of_HEI' => ucwords($data['type-of-hei']),
@@ -49,6 +49,7 @@ if (isset($_POST['admin-update'])) {
       ':contact_person_name' => ucwords($data['contact-person-name']),
       ':contact_person_number' => $data['contact-person-number'],
       ':nstp_component' => $data['nstp-component'],
+      ':term' => ($data['term'] == 'NSTP1') ? '1' : '2',
       ':std_id' => $data['std_id']
     ];
 
@@ -125,13 +126,13 @@ if (isset($_POST['admin-register'])) {
   $errors = validate($data, $register_rules, $pdo);
 
   if (!count($errors) > 0) {
-    $query = "INSERT INTO tbl_20_columns (l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province, region, c_status, religion, email_add, cp_number, college, y_level, course, major, cpce, cpce_cp_number, nstp_component) 
-              VALUES (:last_name, :first_name, :name_extension, :middle_name, :HEI_name, :type_of_HEI, :birthday, :gender, :address_street_barangay, :address_municipality, :address_province, :region, :civil_status, :religion, :email, :contact_number, :college, :year_level, :course, :major, :contact_person_name, :contact_person_number, :nstp_component)";
+    $query = "INSERT INTO tbl_20_columns (l_name, f_name, ex_name, m_name, HEI_name, type_of_HEI, b_date, sex, st_brgy, municipality, province, region, c_status, religion, email_add, cp_number, college, y_level, course, major, cpce, cpce_cp_number, nstp_component, term) 
+              VALUES (:last_name, :first_name, :name_extension, :middle_name, :HEI_name, :type_of_HEI, :birthday, :gender, :address_street_barangay, :address_municipality, :address_province, :region, :civil_status, :religion, :email, :contact_number, :college, :year_level, :course, :major, :contact_person_name, :contact_person_number, :nstp_component, :term)";
 
     $params = array(
       ':last_name' => ucwords($data['last-name']),
       ':first_name' => ucwords($data['first-name']),
-      ':name_extension' => ucwords($data['name-extension']),
+      ':name_extension' => (strcasecmp($data['name-extension'], "N/A")) ?  strToUpper($data['name-extension']) : ucwords($data['name-extension']),
       ':middle_name' => ucwords($data['middle-name']),
       ':HEI_name' => ucwords($data['hei-name']),
       ':type_of_HEI' => ucwords($data['type-of-hei']),
@@ -152,6 +153,7 @@ if (isset($_POST['admin-register'])) {
       ':contact_person_name' => ucwords($data['contact-person-name']),
       ':contact_person_number' => $data['contact-person-number'],
       ':nstp_component' => $data['nstp-component'],
+      ':term' => ($data['term'] == 'NSTP1') ? '1' : '2',
     );
 
     try {
@@ -265,6 +267,36 @@ if (isset($_POST['save_gy_sn'])) {
     echo json_encode(['status' => 'error', 'message' => 'Missing data']);
   }
 }
+
+
+if (isset($_POST['college'])) {
+  $college_id = $_POST['colleges'];
+
+  $stmt = $pdo->prepare("SELECT course_name AS value, course_name AS label, course_id AS data_id FROM tbl_course WHERE college_id = :college_id OR college_id = 6");
+  $stmt->execute([':college_id' => $college_id]);
+
+  // Fetch results as an associative array
+  $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  // Return JSON-encoded data
+  header('Content-Type: application/json');
+  echo json_encode($items);
+}
+
+if (isset($_POST['course'])) {
+  $course_id = $_POST['courses'];
+
+  $stmt = $pdo->prepare("SELECT major_name AS value, major_name AS label, major_id AS data_id FROM tbl_major WHERE course_id = :course_id OR course_id = 22");
+  $stmt->execute([':course_id' => $course_id]);
+
+  // Fetch results as an associative array
+  $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+  // Return JSON-encoded data
+  header('Content-Type: application/json');
+  echo json_encode($items);
+}
+
 
 // udpate grades 
 if (isset($_POST['update-grades'])) {

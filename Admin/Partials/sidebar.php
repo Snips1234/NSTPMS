@@ -20,12 +20,27 @@
           </a>
         </li>
         <li class="nav-item ">
-          <a href="./enrollment.php" class="nav-link">
+          <a href="#" class="nav-link">
             <i class="nav-icon fa fa-users" aria-hidden="true"></i>
             <p>
-              Enrollment
+              Registration
             </p>
+            <i class="right fas fa-angle-left"></i>
           </a>
+          <ul class="nav nav-treeview">
+            <li class="nav-item">
+              <a href="./nstp_1_registration.php" class="nav-link">
+                <i class="fa fa-users" aria-hidden="true"></i>
+                <p>NSTP 1</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="./nstp_2_registration.php" class="nav-link">
+                <i class="fa fa-users"></i>
+                <p>NSTP 2</p>
+              </a>
+            </li>
+          </ul>
         </li>
         <li class="nav-item">
           <a href="./grading.php" class="nav-link">
@@ -69,6 +84,12 @@
               <a href="../Admin/report_serial_number.php" class="nav-link">
                 <i class="fa fa-asterisk" aria-hidden="true"></i>
                 <p>Serial number</p>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="../Admin/csv_upload.php" class="nav-link">
+                <i class="fa fa-asterisk" aria-hidden="true"></i>
+                <p>CSV Upload</p>
               </a>
             </li>
           </ul>

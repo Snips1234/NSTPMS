@@ -21,12 +21,17 @@ function getRowCount($pdo, $tableName, $condition = '')
 }
 
 
-function getData($pdo,  $yearLevel, $college, $ntspComponent, $sex, $search)
+function getData($pdo,  $yearLevel, $college, $ntspComponent, $sex, $search, $term)
 {
     // Build the base query
     $query = "SELECT * FROM `tbl_20_columns` WHERE 1=1";
 
     $params = [];
+
+    if ($term) {
+        $query .= " AND term = :term";
+        $params[':term'] = $term;
+    }
 
     if ($yearLevel) {
         $query .= " AND y_level = :yearLevel";

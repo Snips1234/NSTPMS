@@ -159,6 +159,14 @@ if (isset($_POST['type'])) {
                         <td class="no-wrap fs-4"><b>Serial Number</b></td>
                         <td class=" no-wrap fs-4"><?= htmlspecialchars($data['serial_number']) ?></td>
                       </tr>
+                      <tr>
+                        <td class="no-wrap fs-4"><b>Final Rating (1st sem)</b></td>
+                        <td class=" no-wrap fs-4"><?= htmlspecialchars($data['average_sem_1']) ?></td>
+                      </tr>
+                      <tr>
+                        <td class="no-wrap fs-4"><b>Final Rating (2nd sem)</b></td>
+                        <td class=" no-wrap fs-4"><?= htmlspecialchars($data['average_sem_2']) ?></td>
+                      </tr>
                     </tbody>
                   </table>
                 </div>

@@ -51,7 +51,17 @@ require "Partials/sidebar.php";
 													</select>
 												</div>
 											</div>
-											<div class="col-md-9 mt-1">
+											<div class="col-md-3 mt-1">
+												<div class="control">
+													<label for="term" class="form-label text-secondary">Term</label>
+													<select class="custom-select" id="term" name="term">
+														<option value="" selected>All</option>
+														<option value="1">NSTP 1</option>
+														<option value="2">NSTP 2</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6 mt-1">
 												<div class="control">
 													<label for="search" class="form-label text-secondary">Search</label>
 													<input type="text" id="search" name="search" class="form-control" placeholder="Search..." value="<?= isset($_GET['search'])  ? $_GET['search'] : ''; ?>">
