@@ -70,8 +70,15 @@ if (isset($_POST['admin-update'])) {
 
       if ($success) {
         $_SESSION['response']['update'] = "success";
-        header('Location: Admin/enrollment.php');
-        exit();
+        if $data['term'] == '1'( {
+          header('Location: Admin/nstp_1_registration.php');
+          exit();
+        }else {
+          header('Location: Admin/nstp_2_registration.php');
+          exit();
+        }
+        // header('Location: Admin/enrollment.php');
+        // exit();
       } else {
         $_SESSION['response']['update'] = "failed";
         header('Location: Admin/update_data.php');
