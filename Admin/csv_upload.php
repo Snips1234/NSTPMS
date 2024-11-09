@@ -8,7 +8,7 @@ require "../includes/functions.php";
 include_once('../connection/dsn.php');
 
 // Define the expected number of columns
-$expectedColumnCount = 20;
+$expectedColumnCount = 24;
 
 // Database connection (ensure you have this in your functions.php or here)
 $conn = getDatabaseConnection();
@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Check if CSV has exactly 20 columns
         if (count($headerRow) === $expectedColumnCount) {
           // Prepare your SQL insert statement
-          $stmt = $conn->prepare("INSERT INTO tbl_20_columns (nstp_grad_year, nstp_component, region, serial_number, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province, HEI_name, type_of_HEI, course, y_level, email_add, cp_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+          $stmt = $conn->prepare("INSERT INTO tbl_20_columns (nstp_component, region, l_name, f_name, ex_name, m_name, b_date, sex, st_brgy, municipality, province, HEI_name, type_of_HEI, college,  course, major,  y_level, c_status, religion, email_add, cp_number, cpce, cpce_cp_number) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?)");
 
           // Read and save each row to the database
           while (($data = fgetcsv($handle, 1000, ',')) !== false) {

@@ -45,7 +45,7 @@ try {
           <div class="col-lg-12">
             <form id="" action="generate_serial_number_report.php" method="post">
               <div class="card">
-                <div class="card-header bg-warning">
+                <div class="card-header" style="background-color: rgb(32, 85, 67);">
                   <h4 class="text-white">Serial number report</h4>
                 </div>
                 <div class="card-body">
@@ -118,7 +118,7 @@ try {
                         </div>
                       </div>
                       <div class="col-md-3 align-self-end ">
-                        <button type="submit" name="generate-report" class="btn btn-warning  w-100" value="Submit">Generate</button>
+                        <button type="submit" name="generate-report" class="btn w-100 text-white" value="Submit" style="background-color: rgb(32, 85, 67);">Generate</button>
                         <!-- <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button> -->
                       </div>
                     </div>

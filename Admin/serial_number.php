@@ -21,7 +21,7 @@ try {
   $pdo = getDatabaseConnection();
 
 
-  $query = "SELECT * FROM tbl_20_columns WHERE 1=1";
+  $query = "SELECT * FROM tbl_20_columns WHERE 1=1 AND (term = 1 OR term =2)";
 
 
   if ($search) {
@@ -71,7 +71,7 @@ try {
   $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   // Count query to get total number of entries
-  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1";
+  $countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1 AND (term = 1 OR term =2)";
   if ($search) {
     $countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
   }

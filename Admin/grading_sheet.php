@@ -13,15 +13,26 @@ $college = isset($_GET['college']) ? $_GET['college'] : '';
 $sex = isset($_GET['sex']) ? $_GET['sex'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $component = isset($_GET['nstp_component']) ? $_GET['nstp_component'] : '';
+$term = isset($_GET['term']) ? $_GET['term'] : '';
 
 try {
 	require_once('../connection/dsn.php');
 	$pdo = getDatabaseConnection();
 
-	$query = "SELECT std_id, CONCAT_WS(' ', l_name, f_name, ex_name, m_name) as full_name, b_date, sex, st_brgy, municipality, province, c_status, religion, email_add, cp_number, college, y_level, course, major, quarter_1_grade_sem_1, quarter_1_percent_sem_1, quarter_2_grade_sem_1, quarter_2_percent_sem_1, average_sem_1, average_percent_sem_1, remarks_sem_1, school_year_sem_1, quarter_1_grade_sem_2, quarter_1_percent_sem_2, quarter_2_grade_sem_2, quarter_2_percent_sem_2, average_sem_2, average_percent_sem_2, remarks_sem_2, school_year_sem_2, serial_number, cpce, cpce_cp_number, nstp_component, created_at FROM tbl_20_columns WHERE 1=1 AND term != ''";
+	$query = "SELECT std_id, CONCAT_WS(' ', l_name, f_name, ex_name, m_name) as full_name, b_date, sex, st_brgy, municipality, province, c_status, religion, email_add, cp_number, college, y_level, course, major, quarter_1_grade_sem_1, quarter_1_percent_sem_1, quarter_2_grade_sem_1, quarter_2_percent_sem_1, average_sem_1, average_percent_sem_1, remarks_sem_1, school_year_sem_1, quarter_1_grade_sem_2, quarter_1_percent_sem_2, quarter_2_grade_sem_2, quarter_2_percent_sem_2, average_sem_2, average_percent_sem_2, remarks_sem_2, school_year_sem_2, serial_number, cpce, cpce_cp_number, nstp_component, created_at FROM tbl_20_columns WHERE 1=1 ";
 
 	if ($search) {
 		$query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+
+	if ($term === '' && $component !== '') {
+		$query .= " AND ((nstp_component = :nstp_component AND term = 1) OR (nstp_component = :nstp_component AND term = 2))";
+	} else if ($term !== '' && $component === '') {
+		$query .= " AND term = :term";
+	} else  if ($term !== '' && $component !== '') {
+		$query .= " AND nstp_component = :nstp_component AND term = :term";
+	} else {
+		$query .= " AND (term = 1 OR term = 2)";
 	}
 
 	if ($year_level) {
@@ -47,6 +58,10 @@ try {
 	if ($search) {
 		$stmt->bindValue(':search', $search, PDO::PARAM_STR);
 	}
+	if ($term) {
+		$stmt->bindValue(':term', $term, PDO::PARAM_STR);
+	}
+
 	if ($year_level) {
 		$stmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
 	}
@@ -63,10 +78,20 @@ try {
 	$stmt->execute();
 	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1 AND term != ''";
+	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1 ";
 
 	if ($search) {
 		$countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+
+	if ($term === '' && $component !== '') {
+		$countQuery .= " AND ((nstp_component = :nstp_component AND term = 1) OR (nstp_component = :nstp_component AND term = 2))";
+	} else if ($term !== '' && $component === '') {
+		$countQuery .= " AND term = :term";
+	} else  if ($term !== '' && $component !== '') {
+		$countQuery .= " AND nstp_component = :nstp_component AND term = :term";
+	} else {
+		$countQuery .= " AND (term = 1 OR term = 2)";
 	}
 
 	if ($year_level) {
@@ -90,6 +115,10 @@ try {
 	if ($search) {
 		$countStmt->bindValue(':search', $search, PDO::PARAM_STR);
 	}
+	if ($term !== '') {
+		$countStmt->bindValue(':term', $term, PDO::PARAM_STR);
+	}
+
 	if ($year_level) {
 		$countStmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
 	}
@@ -171,7 +200,17 @@ try {
 													</select>
 												</div>
 											</div>
-											<div class="col-md-9 mt-1">
+											<div class="col-md-3 mt-1">
+												<div class="control">
+													<label for="term" class="form-label text-secondary">Term</label>
+													<select name="term" id="term" class="form-control">
+														<option value="">All</option>
+														<option value="1" <?= isset($_GET['term']) && $_GET['term'] ==  '1' ? 'selected' : ''; ?>>NSTP 1</option>
+														<option value="2" <?= isset($_GET['term']) && $_GET['term'] ==  '2' ? 'selected' : ''; ?>>NSTP 2</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6 mt-1">
 												<div class="control">
 													<label for="search" class="form-label text-secondary">Search</label>
 													<input type="text" id="search" name="search" class="form-control" placeholder="Search..." value="<?= isset($_GET['search'])  ? $_GET['search'] : ''; ?>">

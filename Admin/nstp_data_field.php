@@ -13,15 +13,35 @@ $college = isset($_GET['college']) ? $_GET['college'] : '';
 $sex = isset($_GET['sex']) ? $_GET['sex'] : '';
 $search = isset($_GET['search']) ? $_GET['search'] : '';
 $component = isset($_GET['nstp_component']) ? $_GET['nstp_component'] : '';
+$term = isset($_GET['term']) ? $_GET['term'] : '';
 
 try {
 	require_once('../connection/dsn.php');
 	$pdo = getDatabaseConnection();
 
-	$query = "SELECT * FROM tbl_20_columns WHERE 1=1";
+	$query = "SELECT * FROM tbl_20_columns WHERE 1=1 ";
 
 	if ($search) {
 		$query .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+
+	// if the term is empty then check if the component is empty if not then fetch data matching the component
+	//if the term is not empty then check if the component is empty if not then fetch data matching the component and the term 
+	//but if the component is empty then fetch data matching the term
+	//if term and component are both empty the fetch data with term = 1 or term = 2
+
+	if ($term === '' && $component !== '') {
+		$query .= " AND ((nstp_component = :nstp_component AND term = 1) OR (nstp_component = :nstp_component AND term = 2))";
+	} else if ($term !== '' && $component === '') {
+		$query .= " AND term = :term";
+	} else  if ($term !== '' && $component !== '') {
+		$query .= " AND nstp_component = :nstp_component AND term = :term";
+	} else {
+		$query .= " AND (term = 1 OR term = 2)";
+	}
+
+	if ($component) {
+		$query .= " AND nstp_component = :nstp_component";
 	}
 
 	if ($year_level) {
@@ -36,16 +56,15 @@ try {
 		$query .= " AND sex = :sex";
 	}
 
-	if ($component) {
-		$query .= " AND nstp_component = :nstp_component";
-	}
-
 	$query .= " ORDER BY l_name ASC LIMIT $limit OFFSET $offset";
 
 	$stmt = $pdo->prepare($query);
 
 	if ($search) {
 		$stmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($term) {
+		$stmt->bindValue(':term', $term, PDO::PARAM_STR);
 	}
 	if ($year_level) {
 		$stmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
@@ -63,10 +82,20 @@ try {
 	$stmt->execute();
 	$results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1";
+	$countQuery = "SELECT COUNT(*) as total FROM tbl_20_columns WHERE 1=1 ";
 
 	if ($search) {
 		$countQuery .= " AND (f_name LIKE CONCAT('%', :search, '%') OR l_name LIKE CONCAT('%', :search, '%') OR m_name LIKE CONCAT('%', :search, '%'))";
+	}
+
+	if ($term === '' && $component !== '') {
+		$countQuery .= " AND ((nstp_component = :nstp_component AND term = 1) OR (nstp_component = :nstp_component AND term = 2))";
+	} else if ($term !== '' && $component === '') {
+		$countQuery .= " AND term = :term";
+	} else  if ($term !== '' && $component !== '') {
+		$countQuery .= " AND nstp_component = :nstp_component AND term = :term";
+	} else {
+		$countQuery .= " AND (term = 1 OR term = 2)";
 	}
 
 	if ($year_level) {
@@ -81,14 +110,13 @@ try {
 		$countQuery .= " AND sex = :sex";
 	}
 
-	if ($component) {
-		$countQuery .= " AND nstp_component = :nstp_component";
-	}
-
 	$countStmt = $pdo->prepare($countQuery);
 
 	if ($search) {
 		$countStmt->bindValue(':search', $search, PDO::PARAM_STR);
+	}
+	if ($term) {
+		$countStmt->bindValue(':term', $term, PDO::PARAM_STR);
 	}
 	if ($year_level) {
 		$countStmt->bindValue(':year_level', $year_level, PDO::PARAM_STR);
@@ -177,7 +205,17 @@ try {
 													</select>
 												</div>
 											</div>
-											<div class="col-md-9 mt-1">
+											<div class="col-md-3 mt-1">
+												<div class="control">
+													<label for="term" class="form-label text-secondary">Term</label>
+													<select name="term" id="term" class="form-control">
+														<option value="">All</option>
+														<option value="1" <?= isset($_GET['term']) && $_GET['term'] ==  '1' ? 'selected' : ''; ?>>NSTP 1</option>
+														<option value="2" <?= isset($_GET['term']) && $_GET['term'] ==  '2' ? 'selected' : ''; ?>>NSTP 2</option>
+													</select>
+												</div>
+											</div>
+											<div class="col-md-6 mt-1">
 												<label for="search" class="form-label text-secondary">Search</label>
 												<input type="text" name="search" id="search" class="form-control" placeholder="Search..." value="<?php echo htmlspecialchars($search); ?>">
 											</div>
@@ -348,7 +386,6 @@ try {
 														<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo $i; ?>" class="page-link"><?php echo $i; ?></a>
 													</li>
 												<?php endfor; ?>
-
 												<!-- Next Button -->
 												<li class="paginate_button pagination-sm page-item <?php echo ($page >= $totalPages) ? 'disabled' : ''; ?>">
 													<a href="?search=<?php echo htmlspecialchars($search); ?>&page=<?php echo min($page + 1, $totalPages); ?>" class="page-link">Next</a>

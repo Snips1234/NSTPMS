@@ -8,9 +8,10 @@ $pdo = getDatabaseConnection();
 
 // update data
 if (isset($_POST['admin-update'])) {
+  $term = $_GET['term'];
   $data = $_POST;
   // echo "<pre>";
-  // var_dump($data);
+  // var_dump($term);
   // echo "</pre>";
   $errors = validate($data, $edit_rules, $pdo);
 
@@ -70,15 +71,19 @@ if (isset($_POST['admin-update'])) {
 
       if ($success) {
         $_SESSION['response']['update'] = "success";
-        if $data['term'] == '1'( {
+
+        // Redirect based on the term value
+        if ($term === 'NSTP1') {
           header('Location: Admin/nstp_1_registration.php');
           exit();
-        }else {
+        } else if ($term === 'NSTP2') {
+          // This will handle both 'NSTP2' and any other unexpected term values
           header('Location: Admin/nstp_2_registration.php');
           exit();
+        } else {
+          header('Location: Admin/nstp_not_enrolled_registration.php');
+          exit();
         }
-        // header('Location: Admin/enrollment.php');
-        // exit();
       } else {
         $_SESSION['response']['update'] = "failed";
         header('Location: Admin/update_data.php');

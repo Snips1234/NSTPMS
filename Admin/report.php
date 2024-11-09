@@ -27,18 +27,17 @@ require "Partials/sidebar.php";
 
 	<!-- Main content -->
 	<section class="content">
-		<div class="content">
-			<div class="container-fluid">
+		<div class="content ">
+			<div class="container-fluid ">
 				<div class="row">
 					<div class="col-lg-12">
 						<form id="" action="report_20_columns.php" method="post">
 							<div class="card">
-								<div class="card-header bg-warning">
+								<div class="card-header " style="background-color: rgb(32, 85, 67);">
 									<h4 class="text-white">NSTP DATA FIELD REPORT</h4>
 								</div>
-								<div class="card-body">
+								<div class="card-body px-5">
 									<fieldset>
-										<legend class="text-black-50">Query</legend>
 										<div class="row">
 											<div class="col-md-3 mt-1">
 												<div class="control">
@@ -107,7 +106,7 @@ require "Partials/sidebar.php";
 												</div>
 											</div>
 											<div class="col-md-3 align-self-end ">
-												<button type="submit" name="generate-report" class="btn btn-warning  w-100" value="Submit">Generate</button>
+												<button type="submit" name="generate-report" class="btn w-100 text-white" value="Submit" style="background-color: rgb(32, 85, 67);">Generate</button>
 												<!-- <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button> -->
 											</div>
 										</div>

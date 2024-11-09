@@ -158,7 +158,7 @@ try {
                               <a href="javascript:void(0)" class="btn btn-tool open-view-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-type="view" data-target="#view_modal">
                                 <i class="fas fa-eye text-primary"></i>
                               </a>
-                              <a href="update_data.php?std_id=<?= htmlspecialchars($row['std_id']) ?>" class="btn btn-tool">
+                              <a href="update_data.php?std_id=<?= htmlspecialchars($row['std_id']) ?>&term=NSTP1" class="btn btn-tool">
                                 <i class="fas fa-pen text-success"></i>
                               </a>
                               <!-- <a href="javascript:void(0)" class="btn btn-tool open-delete-modal" type="button" data-toggle="modal" data-id="<?php echo htmlspecialchars($row['std_id']) ?>" data-table="tbl_20_columns" data-target="#delete_modal" data-type="delete">

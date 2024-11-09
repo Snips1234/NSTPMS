@@ -174,8 +174,9 @@ try {
                       <div class="col-md-6 mb-3">
                         <div class="control">
                           <label for="birthday" class="form-label text-secondary">Birthday <span class="text-danger">*</span></label>
-                          <input type="date" class="form-control <?= isset($_SESSION['errors']['birthday']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="birthday" name="birthday" value="<?= isset($_SESSION['old-data']['birthday']) ? htmlspecialchars($_SESSION['old-data']['birthday']) : '' ?>">
-                          <div class="error-container fs-6 text-danger" style="font-size: 12px !important;"></div>
+                          <input type="date" pattern="\d{4}-\d{2}-\d{2}" class="form-control <?= isset($_SESSION['errors']['birthday']) ? 'is-invalid' : (isset($_SESSION['old-data']) ? 'is-valid' : '') ?>" id="birthday" name="birthday" value="<?= isset($_SESSION['old-data']['birthday']) ? htmlspecialchars($_SESSION['old-data']['birthday']) : '' ?>">
+                          <div class=" error-container fs-6 text-danger" style="font-size: 12px !important;">
+                          </div>
                         </div>
                       </div>
                       <div class="col-md-6 mb-3">

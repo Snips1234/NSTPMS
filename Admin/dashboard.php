@@ -12,9 +12,9 @@ require_once('../connection/dsn.php');
 include('../includes/functions.php');
 
 $pdo = getDatabaseConnection();
-$count_cwts = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'CWTS'");
-$count_lts = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'LTS'");
-$count_rotc = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'ROTC'");
+$count_cwts = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'CWTS' AND term != ''");
+$count_lts = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'LTS' AND term != ''");
+$count_rotc = getRowCount($pdo, 'tbl_20_columns', "nstp_component = 'ROTC' AND term != ''");
 $total_students = $count_cwts + $count_lts + $count_rotc;
 ?>
 <!-- Content Wrapper. Contains page content -->

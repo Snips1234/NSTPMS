@@ -82,11 +82,11 @@ $selectedMajor = $results['major'] ?? null;
 			<div class="container-fluid">
 				<div class="row">
 					<div class="col-lg-12">
-						<form id="admin-edit" action="../query.php" method="post" novalidate>
+						<form id="admin-edit" action="../query.php?term=<?= isset($_GET['term']) ? $_GET['term'] : '' ?>" method="post" novalidate>
 							<input type="hidden" id="student-type" name="student-type" value="CWTS">
 							<input type="hidden" id="std_id" name="std_id" value="<?= htmlspecialchars($_GET['std_id']) ?>">
 							<div class="card">
-								<div class="card-header bg-success">
+								<div class="card-header" style="background-color: rgb(32, 85, 67);">
 									<h4 class="text-white">Update student data</h4>
 								</div>
 								<div class="card-body">
@@ -136,7 +136,7 @@ $selectedMajor = $results['major'] ?? null;
 														<option value="NSTP1" <?= (isset($_SESSION['old-data']['term']) && $_SESSION['old-data']['term'] == 'NSTP1') || (isset($results['term']) && $results['term'] == '1')  ? 'selected' : '' ?>>NSTP 1</option>
 
 
-														<option value="LTS" <?= (isset($_SESSION['old-data']['term']) && $_SESSION['old-data']['term'] == 'NSTP2') || (isset($results['term']) && $results['term'] == '2') ? 'selected' : '' ?>>NSTP 2</option>
+														<option value="NSTP2" <?= (isset($_SESSION['old-data']['term']) && $_SESSION['old-data']['term'] == 'NSTP2') || (isset($results['term']) && $results['term'] == '2') ? 'selected' : '' ?>>NSTP 2</option>
 													</select>
 													<div class="error-container fs-6 text-danger" style="font-size: 12px !important;">
 														<?php if (isset($_SESSION['errors']['term'])): ?>
@@ -455,7 +455,7 @@ $selectedMajor = $results['major'] ?? null;
 									<div class="card-footer d-flex justify-content-end">
 										<div class="row">
 											<div class="col-12">
-												<button type="submit" name="admin-update" class="btn btn-success" value="Submit">Submit</button>
+												<button type="submit" name="admin-update" class="btn text-white" style="background-color: rgb(32, 85, 67);" value="Submit">Submit</button>
 												<!-- <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#confirmationModal">Cancel</button> -->
 											</div>
 										</div>

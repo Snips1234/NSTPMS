@@ -24,11 +24,11 @@ if (isset($_POST['type'])) {
         <div class="card">
           <div class="card-header p-2">
             <ul class="nav nav-pills">
-              <li class="nav-item"><a class="nav-link active" href="#information" data-toggle="tab"><i class="fa fa-user mr-1"></i>Information</a></li>
-              <li class="nav-item"><a class="nav-link" href="#education" data-toggle="tab"><i class="fas fa-book mr-1"></i>Education</a></li>
-              <li class="nav-item"><a class="nav-link " href="#address" data-toggle="tab"><i class="fas fa-map-marker-alt mr-1"></i>Address</a></li>
-              <li class="nav-item"><a class="nav-link" href="#nstp" data-toggle="tab"><i class="fas fa-bars"></i> NSTP</a></li>
-              <li class="nav-item"><a class="nav-link" href="#contact" data-toggle="tab"><i class="fa fa-phone mr-1"></i>Contact Person</a></li>
+              <li class="nav-item"><a class="nav-link active btn-sm" href="#information" data-toggle="tab"><i class="fa fa-user mr-1"></i>Personal Information</a></li>
+              <li class="nav-item"><a class="nav-link  btn-sm" href="#education" data-toggle="tab"><i class="fas fa-book mr-1"></i>Education Background</a></li>
+              <li class="nav-item"><a class="nav-link  btn-sm" href="#address" data-toggle="tab"><i class="fas fa-map-marker-alt mr-1"></i>Address</a></li>
+              <li class="nav-item"><a class="nav-link  btn-sm" href="#nstp" data-toggle="tab"><i class="fas fa-bars"></i> NSTP Database</a></li>
+              <li class="nav-item"><a class="nav-link  btn-sm" href="#contact" data-toggle="tab"><i class="fa fa-phone mr-1"></i>Contact Person</a></li>
             </ul>
           </div>
           <div class="card-body p-0">
